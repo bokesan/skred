@@ -81,10 +81,10 @@ public class SkcReader extends AbstractSkReader {
             } else {
                 throw new SkFileCorruptException("unknown record: " + c);
             }
-            char chk = (char) in.read();
-            chk |= (char) in.read() << 8;
-            //if (checksum != (char) chk)
-            //    throw new SkcFileCorruptException("checksum error: expected " + (int) chk + ", got " + (int) checksum);
+            int chk = in.read();
+            chk |= in.read() << 8;
+            if (checksum != (char) chk)
+                throw new SkFileCorruptException("checksum error: expected " + (int) chk + ", got " + (int) checksum);
         }
     }
 
@@ -131,8 +131,10 @@ public class SkcReader extends AbstractSkReader {
         if (in.read(s) < len)
             throw new java.io.EOFException();
         Data r = Data.valueOf(0);
-        for (int i = len - 1; i >= 0; i--)
+        for (int i = len - 1; i >= 0; i--) {
             r = Data.valueOf(1, Int.valueOf(byteToCodePoint(s[i])), r);
+            checksum += (char) s[i];
+        }
         return r;
     }
     
