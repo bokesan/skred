@@ -102,6 +102,19 @@ public class SkcReader extends AbstractSkReader {
         return val;
     }
     
+    private int readWord16(InputStream in) throws IOException {
+        int val = readByte(in);
+        return val | (readByte(in) << 8);
+    }
+    
+    private int readInt32(InputStream in) throws IOException {
+        int val = readByte(in);
+        val |= readByte(in) << 8;
+        val |= readByte(in) << 16;
+        val |= readByte(in) << 24;
+        return val;
+    }
+    
     private Symbol readSymbol(int len, InputStream in) throws IOException {
         char[] s = new char[len];
         for (int i = 0; i < len; i++) {
@@ -132,8 +145,8 @@ public class SkcReader extends AbstractSkReader {
     private Node readList(int len, InputStream in) throws IOException {
         if (len == 0)
             return Data.valueOf(0);
-        if (len == 1)
-            throw new SkFileCorruptException("list of length 1");
+        if (len == 1 || len < 0)
+            throw new SkFileCorruptException("invalid list length: " + len);
         Node[] ns = new Node[len];
         for (int i = 0; i < len; i++)
             ns[i] = readExpression(in);
@@ -162,21 +175,22 @@ public class SkcReader extends AbstractSkReader {
         case SKC_BOOL:          return makeBool((x & 0x20) != 0);
         case SKC_PINT:          return Int.valueOf(unpackSigned(x));
         case SKC_INT8:          return Int.valueOf(sex8(readByte(in)));
-        case SKC_INT16:         x = readByte(in);
-                                x |= readByte(in) << 8;
-                                return Int.valueOf(sex16(x));
-        case SKC_INT32:         x = readByte(in);
-                                x |= readByte(in) << 8;
-                                x |= readByte(in) << 16;
-                                x |= readByte(in) << 24;
-                                return Int.valueOf(x);
+        case SKC_INT16:         return Int.valueOf(sex16(readWord16(in)));
+        case SKC_INT32:         return Int.valueOf(readInt32(in));
         case SKC_CHAR:          return Int.valueOf(readByte(in));
         case SKC_PSTR:          return readString(unpack(x), in);
         case SKC_STR8:          return readString(readByte(in), in);
+        case SKC_STR16:         return readString(readWord16(in), in);
+        case SKC_STR32:         return readString(readInt32(in), in);
         case SKC_PLIST:         return readList(unpack(x), in);
         case SKC_LIST8:         return readList(readByte(in), in);
+        case SKC_LIST16:        return readList(readWord16(in), in);
+        case SKC_LIST32:        return readList(readInt32(in), in);
         case SKC_PSYM:          return readSymbol(unpack(x) + 1, in);
         case SKC_SYM8:          return readSymbol(readByte(in) + 1, in);
+        case SKC_SYM16:         return readSymbol(readWord16(in) + 1, in);
+        case SKC_SYM32:         return readSymbol(readInt32(in) + 1, in);
+        
         default:
             throw new SkFileCorruptException("unexpected byte: " + x);
         }
