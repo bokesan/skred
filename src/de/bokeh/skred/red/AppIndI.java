@@ -1,0 +1,68 @@
+package de.bokeh.skred.red;
+
+public class AppIndI extends Node {
+    private Node fun, arg;
+
+    public AppIndI(Node f, Node a) {
+        assert f != null && a != null;
+        fun = f;
+        arg = a;
+    }
+
+    public boolean isApp() {
+        return true;
+    }
+    
+    public Node getFun() {
+        return fun;
+    }
+
+    public Node getArg() {
+        return arg;
+    }
+
+    public Node eval(RedContext c) {
+        return c.unwind();
+    }
+
+    public Node unwind(RedContext c) {
+        c.push(fun);
+        return null;
+    }
+
+    @Override
+    public void overwriteApp(Node f, Node a) {
+        assert f != null && a != null;
+        if (fun == Function.I_FOR_IND)
+            throw new RedException("tried to overwrite ind node");
+        this.fun = f;
+        this.arg = a;
+    }
+
+    @Override
+    public void overwriteInd(Node target) {
+        assert target != null;
+        //if (fun == Function.I_FOR_IND)
+        //    throw new RedException("tried to overwrite ind node");
+        if (target == this)
+            throw new RedException("circular indirection!");
+        this.fun = Function.I_FOR_IND;
+        this.arg = target;
+    }
+
+    @Override
+    public void overwriteHole() {
+        fun = null;
+        arg = null;
+    }
+
+    @Override
+    public String toString() {
+        if (fun == Function.I_FOR_IND)
+            return "^" + fun;
+        if (arg != null)
+            return "(" + fun + " " + arg + ")";
+        return "#HOLE";
+    }
+
+}
