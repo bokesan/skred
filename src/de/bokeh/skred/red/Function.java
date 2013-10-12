@@ -146,10 +146,7 @@ abstract public class Function extends Node {
     }
     
     public static Function valueOf(String name) {
-        Function f = functionsByName.get(name);
-        if (f == null)
-            throw new IllegalArgumentException("unknown function: " + name);
-        return f;
+        return functionsByName.get(name);
     }
 
     private static void register(int code, Function f) {

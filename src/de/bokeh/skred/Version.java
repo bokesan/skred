@@ -10,7 +10,7 @@ public final class Version {
 
     private static Properties ps = null;
     
-    private static void getVersionProperties() {
+    private static synchronized void getVersionProperties() {
         if (ps == null) {
             ps = new Properties();
             java.io.InputStream is = Version.class.getResourceAsStream("version.properties");
