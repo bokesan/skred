@@ -13,11 +13,8 @@ public abstract class Data extends ValueNode {
         return tag;
     }
     
-    abstract public int getNumFields();
-    abstract public Node getField(int i);
-    
     @Override
-    public String toString() {
+    public String toString(int maxDepth) {
         StringBuilder b = new StringBuilder("#");
         b.append(tag);
         b.append('{');

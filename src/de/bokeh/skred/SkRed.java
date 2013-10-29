@@ -4,6 +4,7 @@ import java.io.*;
 import java.lang.management.*;
 import java.util.*;
 
+import de.bokeh.skred.core.Parser;
 import de.bokeh.skred.input.*;
 import de.bokeh.skred.red.*;
 
@@ -42,7 +43,8 @@ public class SkRed {
             }
         }
         Function.init(evalProjections);
-        SkReader r = new SkcReader(appFactory);
+        // SkReader r = new SkcReader(appFactory);
+        SkReader r = new Parser(appFactory);
         long startTime = System.nanoTime();
         for (String s : programFiles) {
             if (stats != null)
@@ -62,12 +64,21 @@ public class SkRed {
             if (!(x instanceof Data))
                 break;
             Data p = (Data) x;
-            if (p.getTag() != 1 || p.getNumFields() != 2)
+            if (p.getTag() != 1 || p.getNumFields() != 2) {
+                if (p.getTag() != 0 || p.getNumFields() != 0) {
+                    System.out.println("unexpected result: " + p.toString(5));
+                }
                 break;
+            }
             c.push(p.getField(0));
             c.eval();
             Node ch = c.getTos();
-            System.out.print((char) ch.intValue());
+            int char_ = ch.intValue();
+            if (char_ <= 0) {
+                System.out.println("invalid char: " + char_);
+            } else {
+                System.out.print((char) char_);
+            }
             c.pop1();
             c.setTos(p.getField(1));
         }
@@ -89,7 +100,7 @@ public class SkRed {
                 b.append(" free");
                 b.append("\nAnzahl Prozessoren: ");
                 b.append(ru.availableProcessors());
-                stats.println(b.toString());
+                //stats.println(b.toString());
             }
 
             b = new StringBuilder("System-Properties:");
@@ -99,7 +110,7 @@ public class SkRed {
                 b.append('=');
                 b.append(e.getValue());
             }
-            stats.println(b.toString());
+            //stats.println(b.toString());
 
             stats.println(c.toString());
             OperatingSystemMXBean os = ManagementFactory.getOperatingSystemMXBean();

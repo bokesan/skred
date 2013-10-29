@@ -57,11 +57,15 @@ public class AppIndI extends Node {
     }
 
     @Override
-    public String toString() {
+    public String toString(int d) {
+        if (d <= 0) {
+            return "?";
+        }
+        d--;
         if (fun == Function.I_FOR_IND)
-            return "^" + fun;
+            return "^" + fun.toString(d);
         if (arg != null)
-            return "(" + fun + " " + arg + ")";
+            return "(" + fun.toString(d) + " " + arg.toString(d) + ")";
         return "#HOLE";
     }
 

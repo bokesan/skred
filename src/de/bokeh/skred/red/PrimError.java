@@ -3,7 +3,7 @@ package de.bokeh.skred.red;
 public class PrimError extends Function {
 
     public PrimError() {
-        super("_ERROR", 1);
+        super("error", 1);
     }
 
     @Override

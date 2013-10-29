@@ -82,11 +82,15 @@ public final class AppCond extends Node {
     }
 
     @Override
-    public String toString() {
+    public String toString(int d) {
+        if (d <= 0) {
+            return "?";
+        }
+        d--;
         if (arg != null)
-            return "(" + fun + " " + arg + ")";
+            return "(" + fun.toString(d) + " " + arg.toString(d) + ")";
         if (fun != null)
-            return "^" + fun;
+            return "^" + fun.toString(d);
         return "#HOLE";
     }
    

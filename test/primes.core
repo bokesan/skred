@@ -1,0 +1,48 @@
+--
+-- sieve of erathostenes.
+--
+
+-- main :: String
+main = showInts (take 1000 (sieve (enumFrom 2)));
+
+-- showInts :: [Int] -> String
+showInts = foldr (\n s -> showsInt n ('\n' : s)) "";
+
+-- sieve :: [int] -> [int]
+sieve xs = case xs of {
+             <0> -> error "foo";
+             <1> h t -> h : sieve (sieve1 h t)
+           };
+
+sieve1 p xs = case xs of {
+                <0> -> [];
+                <1> h t -> if h % p == 0 then
+                             sieve1 p t
+                           else
+                             h : (sieve1 p t)
+              };
+
+enumFrom n = n : enumFrom (n + 1);
+
+showsInt n s =
+  if n == 0 then '0' : s
+  else if n < 0 then '-' : i2s_ (negate n) s
+  else i2s_ n s;
+
+i2s_ n result = if n == 0 then result
+                else i2s_ (n / 10) (digitToChar (n % 10) : result);
+
+digitToChar d = 48 + d;
+
+negate n = 0 - n;
+
+foldr f z xs = case xs of {
+                 <0> -> z;
+                 <1> y ys -> f y (foldr f z ys)
+               };
+
+take n xs = if n <= 0 then []
+            else case xs of {
+                   <0> -> [];
+                   <1> h t -> h : take (n - 1) t
+                 }

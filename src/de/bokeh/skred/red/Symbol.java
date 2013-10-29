@@ -13,7 +13,7 @@ public class Symbol extends ValueNode {
     }
 
     @Override
-    public String toString() {
+    public String toString(int d) {
         return sym;
     }
     

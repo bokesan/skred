@@ -17,16 +17,23 @@ public abstract class Node {
     
     abstract public Node getArg();
     
+    abstract public String toString(int maxDepth);
+    
+    @Override
+    public String toString() {
+        return toString(12);
+    }
+
     public Node getFun() {
-        throw new RedException("not an application node");
+        throw new RedException("not an application node: " + this);
     }
     
     public int intValue() {
-        throw new RedException("intValue not defined");
+        throw new RedException("intValue not defined: " + this);
     }
     
     public double doubleValue() {
-        throw new RedException("doubleValue not defined");
+        throw new RedException("doubleValue not defined: " + this);
     }
     
     public boolean isApp() {
@@ -34,10 +41,14 @@ public abstract class Node {
     }
     
     public int getTag() {
-        throw new RedException("getTag not defined");
+        throw new RedException("getTag not defined: " + this);
     }
     
     public Node getField(int n) {
-        throw new RedException("getField not defined");
+        throw new RedException("getField not defined: " + this);
+    }
+    
+    public int getNumFields() {
+        throw new RedException("getNumFields not defined: " + this);
     }
 }

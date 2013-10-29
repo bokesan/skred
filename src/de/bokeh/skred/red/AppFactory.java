@@ -1,22 +1,24 @@
 package de.bokeh.skred.red;
 
+import java.util.List;
+
 public abstract class AppFactory {
 
     public Node mkApp(Node f, Node a) {
         if (f == Function.C) {
-            if (a == Function.valueOf("add") || a == Function.valueOf("mul")
-                    || a == Function.valueOf("eq") || a == Function.valueOf("neq"))
+            if (a == Function.valueOf("+") || a == Function.valueOf("*")
+                    || a == Function.valueOf("==") || a == Function.valueOf("/="))
                 return a;
-            if (a == Function.valueOf("less")) return Function.valueOf("greater");
-            if (a == Function.valueOf("greater")) return Function.valueOf("less");
-            if (a == Function.valueOf("less_eq")) return Function.valueOf("gr_eq");
-            if (a == Function.valueOf("gr_eq")) return Function.valueOf("less_eq");
-            if (a == Function.valueOf("sub")) return Function.valueOf("Rsub");
-            if (a == Function.valueOf("Rsub")) return Function.valueOf("sub");
-            if (a == Function.valueOf("div")) return Function.valueOf("Rdiv");
-            if (a == Function.valueOf("Rdiv")) return Function.valueOf("div");
-            if (a == Function.valueOf("rem")) return Function.valueOf("Rrem");
-            if (a == Function.valueOf("Rrem")) return Function.valueOf("rem");
+            if (a == Function.valueOf("<")) return Function.valueOf(">");
+            if (a == Function.valueOf(">")) return Function.valueOf("<");
+            if (a == Function.valueOf("<=")) return Function.valueOf(">=");
+            if (a == Function.valueOf(">=")) return Function.valueOf("<=");
+            if (a == Function.valueOf("-")) return Function.valueOf("Rsub");
+            if (a == Function.valueOf("Rsub")) return Function.valueOf("-");
+            if (a == Function.valueOf("/")) return Function.valueOf("Rdiv");
+            if (a == Function.valueOf("Rdiv")) return Function.valueOf("/");
+            if (a == Function.valueOf("%")) return Function.valueOf("Rrem");
+            if (a == Function.valueOf("Rrem")) return Function.valueOf("%");
         }
         else if (f == Function.B && a == Function.B) {
             return Function.valueOf("B'");
@@ -30,6 +32,25 @@ public abstract class AppFactory {
             return Function.getI();
         }
         return newApp(f, a);
+    }
+    
+    public Node mkApp(Node f, Node a1, Node a2) {
+        return mkApp(mkApp(f, a1), a2);
+    }
+    
+    public Node mkApp(Node f, Node a1, Node a2, Node a3) {
+        return mkApp(mkApp(mkApp(f, a1), a2), a3);
+    }
+    
+    public Node mkApp(Node f, Node a1, Node a2, Node a3, Node a4) {
+        return mkApp(mkApp(mkApp(mkApp(f, a1), a2), a3), a4);
+    }
+    
+    public Node mkApp(Node f, List<Node> args) {
+        for (Node a : args) {
+            f = mkApp(f, a);
+        }
+        return f;
     }
 
     abstract protected Node newApp(Node fun, Node arg);

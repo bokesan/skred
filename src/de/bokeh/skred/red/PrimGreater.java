@@ -6,7 +6,7 @@ package de.bokeh.skred.red;
 class PrimGreater extends Function {
 
     public PrimGreater() {
-        super("greater", 2);
+        super(">", 2);
     }
 
     @Override

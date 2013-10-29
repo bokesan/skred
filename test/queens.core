@@ -1,0 +1,151 @@
+
+-- safeQueen		:: [Int] -> Int -> Bool
+-- safeQueen oldqs newq    =  newq `notElem` oldqs && nodiag 1 oldqs
+--   where
+--      nodiag i []       =  True
+--      nodiag i (q:qs)   =  abs (newq-q) /= i && nodiag (i+1) qs
+
+-- safeQueen1 :: [Int] -> Int -> Bool
+safeQueen1 oldqs newq	=  h oldqs oldqs newq;
+h oldqs qqs q = case qqs of {
+                  <0> ->  nodiag1 q 1 oldqs;
+                  <1> q1 qs -> if q == q1 then False else h oldqs qs q
+                };
+
+nodiag1 nq i qqs =
+   case qqs of {
+     <0> -> True;
+     <1> q qs -> if (nq-q)==i then False
+                 else if (q-nq)==i then False
+                 else nodiag1 nq (succ i) qs
+   };
+
+-- nextQueen :: Int -> [Int] -> [[Int]]
+-- nextQueen n qs =  [ i:qs | i <- [1..n], safeQueen' qs i ]
+nextQueen n qs = nxq qs n [];
+nxq qs n r = if zero n then
+		r
+	     else if safeQueen1 qs n then
+		nxq qs (pred n) ((n:qs) : r)
+	     else
+		nxq qs (pred n) r;
+
+nextQueen1 n qs = nxq1 n qs 1;
+nxq1 n qs i = if i>n then []
+              else if safeQueen1 qs n then (i:qs) : nxq1 n qs (succ i)
+              else nxq1 n qs (succ i);
+
+-- isFull :: Int -> [a] -> Bool
+-- isFull n qs		=  length qs == n
+-- isFull n []		=  n == 0
+-- isFull n (_:xs)	=  if n == 0 then False else isFull (n-1) xs
+isFull n qs = lengthEq n qs;
+lengthEq n xs =
+   if zero n then
+      (null xs)
+   else
+      case xs of { <0> -> False; <1> h t -> lengthEq (pred n) t };
+
+
+depthQueen n =  filter (isFull n) (depthFirst (nextQueen n) []);
+
+-- breadthQueen n =  filter (isFull n) (breadthFirst (nextQueen n) [])
+
+-- depthFirst, breadthFirst :: (a -> [a]) -> a -> [a]
+
+depthFirst next x = dfs next (x:[]);
+dfs next xs = case xs of {
+                <0> -> [];
+                <1> y ys -> y : dfs next (append (next y) ys)
+              };
+
+
+-- breadthFirst next x = bfs next [x];
+-- bfs next xs = _LISTCASE []
+--                 (\y ys -> y : bfs next (ys ++ next y)) xs;
+
+
+-- main :: String
+main = doit stdin;
+stdin = _READ (_STD_PORT 0);
+
+doit s = doit1 (takeWhile isDigit s);
+doit1 ns = doit2 ns (head (string_to_integer ns));
+doit2 ns n =
+  append "Queens "
+  (append ns
+  (append ": "
+  (showsInt (length (depthQueen n))
+  " solutions.\n")));
+
+False = Pack{0,0};
+True = Pack{1,0};
+
+null xs = case xs of { <0> -> True; <1> y ys -> False };
+
+head xs = case xs of { <0> -> error "HEAD";
+                       <1> h t -> h };
+
+append lyst ys = case lyst of {
+                   <0> -> ys;
+                   <1> x xs -> x : append xs ys
+                 };
+showsInt n s =
+  if n == 0 then '0' : s
+  else if n < 0 then '-' : i2s_ (negate n) s
+  else i2s_ n s;
+
+i2s_ n result = if n == 0 then result
+                else i2s_ (n / 10) (digitToChar (n % 10) : result);
+
+digitToChar d = 48 + d;
+
+negate n = 0 - n;
+
+-- string_to_integer :: String -> (Int,String)
+s2i r cs = case cs of {
+             <0> -> r : cs;
+             <1> d ds -> if isDigit d then
+                         s2i (10*r + digit_to_int d) ds
+                      else
+                         r : cs };
+
+string_to_integer c =
+   case dropWhile isSpace c of {
+     <0> -> error "A1";
+     <1> hd tl -> if hd == '-' then
+                     case tl of { <0> -> error "A2";
+                       <1> hr tr -> negate hr : tr }
+                  else if isDigit hd then
+                     s2i (digit_to_int hd) tl
+                  else
+                     error "A3"
+   };
+
+digit_to_int d = d - 48;
+
+isDigit c = and (c >= 48) (c < 58);
+isSpace c = or (c == 32) (c == 9);
+
+and p q = if p then q else False;
+or p q = if p then p else q;
+
+dropWhile p xs = case xs of {
+                   <0> -> [];
+                   <1> y ys -> if p y then dropWhile p ys else xs };
+
+takeWhile p xs = case xs of {
+                   <0> -> [];
+                   <1> y ys -> if p y then y : takeWhile p ys
+                               else []
+                 };
+
+filter p xs = case xs of {
+                <0> -> [];
+                <1> y ys -> if p y then y : filter p ys
+                            else filter p ys };
+
+length xs = case xs of {
+              <0> -> 0;
+              <1> h t -> succ (length t)
+            }

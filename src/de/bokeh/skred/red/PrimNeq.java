@@ -6,7 +6,7 @@ package de.bokeh.skred.red;
 class PrimNeq extends Function {
 
     public PrimNeq() {
-        super("neq", 2);
+        super("/=", 2);
     }
 
     @Override

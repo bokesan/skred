@@ -18,4 +18,8 @@ public class InputPort extends ValueNode {
         }
     }
     
+    public String toString(int d) {
+        return "InputPort[" + in + "]";
+    }
+    
 }

@@ -55,7 +55,7 @@ abstract public class Function extends Node {
 
     abstract Node exec(RedContext c);
 
-    public String toString() {
+    public String toString(int maxDepth) {
         return name;
     }
     

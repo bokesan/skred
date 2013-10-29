@@ -51,8 +51,8 @@ public final class AppST extends Node {
     }
 
     @Override
-    public String toString() {
-        return state.toString(this);
+    public String toString(int maxDepth) {
+        return state.toString(this, maxDepth);
     }
    
     abstract private static class NodeHandler {
@@ -63,7 +63,7 @@ public final class AppST extends Node {
         abstract void overwriteHole(AppST me);
         abstract void overwriteInd(AppST me, Node target);
         abstract void overwriteApp(AppST me, Node fun, Node arg);
-        abstract String toString(AppST me);
+        abstract String toString(AppST me, int maxDepth);
     }
 
     private static final NodeHandler APP_HANDLER = new AppHandler();
@@ -112,8 +112,12 @@ public final class AppST extends Node {
             me.arg = null;
         }
 
-        String toString(AppST me) {
-            return "(" + me.fun + " " + me.arg + ")";
+        String toString(AppST me, int d) {
+            if (d <= 0) {
+                return "?";
+            }
+            d--;
+            return "(" + me.fun.toString(d) + " " + me.arg.toString(d) + ")";
         }
     }
     
@@ -153,8 +157,11 @@ public final class AppST extends Node {
             throw new RedException("tried to overwrite ind node");
         }
 
-        String toString(AppST me) {
-            return "^" + me.fun;
+        String toString(AppST me, int d) {
+            if (d <= 0) {
+                return "^?";
+            }
+            return "^" + me.fun.toString(d - 1);
         }
     }
     
@@ -198,7 +205,7 @@ public final class AppST extends Node {
             throw new RedException("unwind of hole");
         }
 
-        String toString(AppST me) {
+        String toString(AppST me, int d) {
             return "#HOLE";
         }
     }

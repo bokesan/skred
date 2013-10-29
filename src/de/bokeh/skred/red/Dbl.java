@@ -16,7 +16,7 @@ public final class Dbl extends ValueNode {
         return val;
     }
     
-    public String toString() {
+    public String toString(int maxDepth) {
         return Double.toString(val);
     }
     
