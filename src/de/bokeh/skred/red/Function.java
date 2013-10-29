@@ -232,4 +232,8 @@ abstract public class Function extends Node {
     protected static Function getLISTCASE() {
         return LISTCASE;
     }
+    
+    public int getArity() {
+        return numArgs;
+    }
 }

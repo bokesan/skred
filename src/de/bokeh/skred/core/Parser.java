@@ -19,7 +19,6 @@ import de.bokeh.skred.red.Int;
 import de.bokeh.skred.red.Node;
 import de.bokeh.skred.red.PrimCase;
 import de.bokeh.skred.red.PrimPack;
-import de.bokeh.skred.red.PrimUnpack;
 import de.bokeh.skred.red.Symbol;
 
 public class Parser extends AbstractSkReader {
@@ -334,15 +333,15 @@ aexp        --> var con literal
                 syntaxError("missing tag in case: " + i);
             }
             arities[i] = a.xs.size();
-            altExprs.add(appFactory.mkApp(PrimUnpack.of(arities[i]), ba.abs(a.xs, a.e)));
+            altExprs.add(ba.abs(a.xs, a.e));
             i++;
         }
 
         Function c;
         if (def == null) {
-            c = PrimCase.of(arities.length);
+            c = PrimCase.of(arities);
         } else {
-            c = PrimCase.withDefault(arities.length);
+            c = PrimCase.withDefault(arities);
             altExprs.add(def.e);
         }
         altExprs.add(e);

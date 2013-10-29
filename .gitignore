@@ -1,3 +1,6 @@
 /uncontrolled
 /build
 /dist
+*~
+*.o
+*.hi
