@@ -55,7 +55,7 @@ public class Parser extends AbstractSkReader {
             String s = currTok.text;
             skip();
             List<String> args = new ArrayList<>();
-            while (currTok.kind == Kind.QVARID) {
+            while (currTok.kind == Kind.QVARID || (currTok.kind == Kind.RESERVEDID && "_".equals(currTok.text))) {
                 args.add(currTok.text);
                 skip();
             }
@@ -190,7 +190,7 @@ aexp        --> var con literal
     private Node lambda() throws IOException {
         skip();
         List<String> xs = new ArrayList<>();
-        while (currTok.kind == Kind.QVARID) {
+        while (currTok.kind == Kind.QVARID || (currTok.kind == Kind.RESERVEDID && "_".equals(currTok.text))) {
             xs.add(currTok.text);
             skip();
         }
@@ -342,7 +342,11 @@ aexp        --> var con literal
             c = PrimCase.of(arities);
         } else {
             c = PrimCase.withDefault(arities);
-            altExprs.add(def.e);
+            if (def.xs.get(0).equals("_")) {
+                altExprs.add(appFactory.mkApp(Function.valueOf("K"), def.e));
+            } else {
+                altExprs.add(ba.abs(def.xs, def.e));
+            }
         }
         altExprs.add(e);
         return appFactory.mkApp(c, altExprs);
@@ -375,7 +379,8 @@ aexp        --> var con literal
 
     private Alt alt() throws IOException {
         Alt a = new Alt();
-        if (currTok.kind == Kind.RESERVEDID && "_".equals(currTok.text)) {
+        if (currTok.kind == Kind.QVARID || (currTok.kind == Kind.RESERVEDID && "_".equals(currTok.text))) {
+            a.xs.add(currTok.text);
             skip();
             a.tag = -1;
         } else {
@@ -384,7 +389,7 @@ aexp        --> var con literal
             accept(Kind.LIT_INT);
             a.tag = Integer.parseInt(n);
             accept(Kind.QVARSYM, ">");
-            while (currTok.kind == Kind.QVARID) {
+            while (currTok.kind == Kind.QVARID || (currTok.kind == Kind.RESERVEDID && "_".equals(currTok.text))) {
                 a.xs.add(currTok.text);
                 skip();
             }

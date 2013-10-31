@@ -25,6 +25,9 @@ public class BA {
     }
     
     public Node abs(String x, Node e) {
+        if (x.equals("_")) {
+            return appFactory.mkApp(Function.valueOf("K"), e); 
+        }
         if (e.isApp()) {
             return opt(abs(x, e.getFun()), abs(x, e.getArg()));
         } else {
