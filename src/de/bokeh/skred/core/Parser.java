@@ -332,6 +332,7 @@ aexp        --> var con literal
             if (a.tag != i) {
                 syntaxError("missing tag in case: " + i);
             }
+            rTrim(a.xs, "_");
             arities[i] = a.xs.size();
             altExprs.add(ba.abs(a.xs, a.e));
             i++;
@@ -366,6 +367,14 @@ aexp        --> var con literal
   unpack2 f obj = f obj[0] obj[1]
 
 */
+
+    private static <T> void rTrim(List<T> xs, T x) {
+        int n = xs.size();
+        while (n > 0 && xs.get(n - 1).equals(x)) {
+            n--;
+            xs.remove(n);
+        }
+    }
     
     
     
