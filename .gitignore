@@ -4,4 +4,5 @@
 *~
 *.o
 *.hi
+*.stats
 .DS_Store
