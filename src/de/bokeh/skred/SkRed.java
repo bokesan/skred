@@ -43,7 +43,6 @@ public class SkRed {
             }
         }
         Function.init(evalProjections);
-        // SkReader r = new SkcReader(appFactory);
         SkReader r = new Parser(appFactory);
         long startTime = System.nanoTime();
         for (String s : programFiles) {

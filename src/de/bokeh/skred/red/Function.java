@@ -61,9 +61,6 @@ abstract public class Function extends Node {
     
     // Factory
     
-    private static final int MAX_FUNCTION_CODE = 106;
-    
-    private static final Function[] functionsByCode = new Function[MAX_FUNCTION_CODE+1];
     private static final Map<String, Function> functionsByName = new HashMap<String, Function>();
     
     private static Function LISTCASE;
@@ -83,75 +80,65 @@ abstract public class Function extends Node {
             K = new CombK_Eval();
             K1 = new CombK1_Eval();
             LISTCASE = new CombListcase_Eval();
-            register(48, new PrimCompare0_Eval());
-            register(50, new CombIf_Eval());
+            register(new PrimCompare0_Eval());
+            register(new CombIf_Eval());
         } else {
             I = new CombI();
             K = new CombK();
             K1 = new CombK1();
             LISTCASE = new CombListcase();
-            register(48, new PrimCompare0());
-            register(50, new CombIf());
+            register(new PrimCompare0());
+            register(new CombIf());
         }
         
-        register(0, S);
-        register(1, B);
-        register(2, C);
-        register(3, new CombS1());
-        register(4, new CombB1());
-        register(5, new CombC1());
-        register(6, new CombBs());
-        register(7, I);
-        register(8, K);
-        register(9, new CombU());
-        register(10, new CombY());
-        register(11, new CombW());
-        register(12, K1);
-        register(20, new CombCons());
-        register(30, new PrimAddInt());
-        register(31, new PrimMulInt());
-        register(32, new PrimSubInt());
-        register(33, new PrimDivInt());
-        register(34, new PrimRemInt());
-        register(35, new PrimSucc());
-        register(36, new PrimPred());
-        register(37, new PrimRsubInt());
-        register(38, new PrimRdivInt());
-        register(39, new PrimRremInt());
+        register(S);
+        register(B);
+        register(C);
+        register(new CombS1());
+        register(new CombB1());
+        register(new CombC1());
+        register(new CombBs());
+        register(I);
+        register(K);
+        register(new CombU());
+        register(new CombY());
+        register(new CombW());
+        register(K1);
+        register(new CombCons());
+        register(new PrimAddInt());
+        register(new PrimMulInt());
+        register(new PrimSubInt());
+        register(new PrimDivInt());
+        register(new PrimRemInt());
+        register(new PrimSucc());
+        register(new PrimPred());
+        register(new PrimRsubInt());
+        register(new PrimRdivInt());
+        register(new PrimRremInt());
+        register(new PrimLess());
+        register(new PrimLessEq());
+        register(new PrimGreater());
+        register(new PrimGreaterEq());
+        register(new PrimEq());
+        register(new PrimNeq());
+        register(new PrimZero());
         
-        register(40, new PrimLess());
-        register(41, new PrimLessEq());
-        register(42, new PrimGreater());
-        register(43, new PrimGreaterEq());
-        register(44, new PrimEq());
-        register(45, new PrimNeq());
-        register(46, new PrimZero());
+        register(new CombTypePred("boolean"));
+        register(new CombTypePred("pair"));
+        register(new CombTypePred("char"));
+        register(new CombTypePred("number"));
         
-        register(70, new CombTypePred("boolean"));
-        register(71, new CombTypePred("pair"));
-        register(73, new CombTypePred("char"));
-        register(74, new CombTypePred("number"));
-        
-        register(100, ERROR);
-        register(102, LISTCASE);
-        register(105, new PrimRead());
-        register(106, new PrimStdPort());
-    }
-    
-    public static Function valueOf(int code) {
-        Function f = functionsByCode[code];
-        if (f == null)
-            throw new IllegalArgumentException("unknown function code: " + code);
-        return f;
+        register(ERROR);
+        register(LISTCASE);
+        register(new PrimRead());
+        register(new PrimStdPort());
     }
     
     public static Function valueOf(String name) {
         return functionsByName.get(name);
     }
 
-    private static void register(int code, Function f) {
-        assert functionsByCode[code] == null;
-        functionsByCode[code] = f;
+    private static void register(Function f) {
         Function old = functionsByName.put(f.name, f);
         assert old == null;
     }
@@ -195,9 +182,8 @@ abstract public class Function extends Node {
     
     public static List<Stats> getStats() {
         ArrayList<Stats> st = new ArrayList<Stats>();
-        for (int i = 0; i <= MAX_FUNCTION_CODE; i++) {
-            Function f = functionsByCode[i];
-            if (f != null && f.evalCount + f.unwindCount > 0) {
+        for (Function f : functionsByName.values()) {
+            if (f.evalCount + f.unwindCount > 0) {
                 st.add(new Stats(f.name, f.evalCount, f.unwindCount, f.argCheckCount));
             }
         }
@@ -235,5 +221,36 @@ abstract public class Function extends Node {
     
     public int getArity() {
         return numArgs;
+    }
+
+    public static Node primPack(int tag, int arity) {
+        if (arity == 0) {
+            return Data.valueOf(tag);
+        }
+        String name = "Pack{" + tag + "," + arity + "}";
+        Function f = functionsByName.get(name);
+        if (f == null) {
+            f = new PrimPack(tag, arity);
+            functionsByName.put(name, f);
+        }
+        return f;
+    }
+
+    public static Function primCase(int[] arities) {
+        return primCase(arities, false);
+    }
+
+    public static Function primCaseWithDefault(int[] arities) {
+        return primCase(arities, true);
+    }
+
+    private static Function primCase(int[] arities, boolean def) {
+        Function f = new PrimCase(arities, def);
+        Function f1 = functionsByName.get(f.name);
+        if (f1 == null) {
+            f1 = f;
+            functionsByName.put(f.name, f);
+        }
+        return f1;
     }
 }

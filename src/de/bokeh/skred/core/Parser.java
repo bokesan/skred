@@ -17,8 +17,6 @@ import de.bokeh.skred.red.Data;
 import de.bokeh.skred.red.Function;
 import de.bokeh.skred.red.Int;
 import de.bokeh.skred.red.Node;
-import de.bokeh.skred.red.PrimCase;
-import de.bokeh.skred.red.PrimPack;
 import de.bokeh.skred.red.Symbol;
 
 public class Parser extends AbstractSkReader {
@@ -120,10 +118,10 @@ aexp        --> var con literal
             skip();
             es.add(expr6());
         }
-        return rassoc((Function)PrimPack.of(1, 2), es);
+        return rassoc(Function.primPack(1, 2), es);
     }
     
-    private Node rassoc(Function f, List<Node> xs) {
+    private Node rassoc(Node f, List<Node> xs) {
         int n = xs.size();
         Node e = xs.get(n - 1);
         for (int i = n - 2; i >= 0; i--) {
@@ -259,7 +257,7 @@ aexp        --> var con literal
         // TODO
         skip();
         accept(Kind.RBRACKET);
-        return PrimPack.of(0, 0);
+        return Function.primPack(0, 0);
     }
 
     private Node makeString(String s) {
@@ -281,7 +279,7 @@ aexp        --> var con literal
         String a = currTok.text;
         accept(Kind.LIT_INT);
         accept(Kind.RBRACE);
-        return PrimPack.of(Integer.parseInt(t), Integer.parseInt(a));
+        return Function.primPack(Integer.parseInt(t), Integer.parseInt(a));
     }
 
     private Node conditional() throws IOException {
@@ -340,9 +338,9 @@ aexp        --> var con literal
 
         Function c;
         if (def == null) {
-            c = PrimCase.of(arities);
+            c = Function.primCase(arities);
         } else {
-            c = PrimCase.withDefault(arities);
+            c = Function.primCaseWithDefault(arities);
             if (def.xs.get(0).equals("_")) {
                 altExprs.add(appFactory.mkApp(Function.valueOf("K"), def.e));
             } else {

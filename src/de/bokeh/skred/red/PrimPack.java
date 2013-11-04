@@ -1,37 +1,15 @@
 package de.bokeh.skred.red;
 
-import java.util.HashMap;
-import java.util.Map;
 
 public class PrimPack extends Function {
 
     private final int tag;
     private final int arity;
     
-    private PrimPack(int tag, int arity) {
+    public PrimPack(int tag, int arity) {
         super("Pack{" + tag + "," + arity + "}", arity);
         this.tag = tag;
         this.arity = arity;
-    }
-    
-    private static final Map<Integer, Map<Integer, Node>> consByTag = new HashMap<>();
-    
-    public static Node of(int tag, int arity) {
-        Map<Integer, Node> byArity = consByTag.get(tag);
-        if (byArity == null) {
-            byArity = new HashMap<>();
-            consByTag.put(tag, byArity);
-        }
-        Node p = byArity.get(arity);
-        if (p == null) {
-            if (arity == 0) {
-                p = Data.valueOf(tag);
-            } else {
-                p = new PrimPack(tag, arity);
-            }
-            byArity.put(arity, p);
-        }
-        return p;
     }
     
     

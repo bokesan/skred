@@ -6,7 +6,7 @@ public class PrimCase extends Function {
     private final int[] arities;
     private final boolean hasDefault;
     
-    private PrimCase(int[] arities, boolean d) {
+    public PrimCase(int[] arities, boolean d) {
         super(getName(arities, d), arities.length + (d ? 2 : 1));
         this.arities = arities;
         this.hasDefault = d;
@@ -25,25 +25,6 @@ public class PrimCase extends Function {
         }
         b.append('}');
         return b.toString();
-    }
-    
-    private static final PrimCase CASE_BOOL  = new PrimCase(new int[]{0,0}, false);
-    private static final PrimCase CASE_MAYBE = new PrimCase(new int[]{0,1}, false);
-    private static final PrimCase CASE_LIST  = new PrimCase(new int[]{0,2}, false);
-    
-    public static Function of(int[] arities) {
-        if (arities.length == 2 && arities[0] == 0) {
-            switch (arities[1]) {
-            case 0: return CASE_BOOL;
-            case 1: return CASE_MAYBE;
-            case 2: return CASE_LIST;
-            }
-        }
-        return new PrimCase(arities, false);
-    }
-
-    public static Function withDefault(int[] arities) {
-        return new PrimCase(arities, true);
     }
     
     @Override
