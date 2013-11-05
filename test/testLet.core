@@ -1,0 +1,1 @@
+main = let { a = 1; b x = 2 + x } in showsInt (a + b 3) "\n"

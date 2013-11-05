@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -28,8 +29,6 @@ public class Parser extends AbstractSkReader {
     
     private Lexeme currTok;
     
-    private boolean verbose = true;
-    
     public Parser(AppFactory appFactory) {
         super(appFactory);
         this.appFactory = appFactory;
@@ -46,6 +45,18 @@ public class Parser extends AbstractSkReader {
         BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
         this.lex = new Lexer(in, file.getName());
         skip();
+        Map<String, Node> ds = defns();
+        in.close();
+        if (currTok.kind != Kind.EOF) {
+            syntaxError("EOF expected, but got " + currTok);
+        }
+        for (Map.Entry<String, Node> e : ds.entrySet()) {
+            defns.put(e.getKey(), e.getValue());
+        }
+    }
+
+    private Map<String, Node> defns() throws IOException {
+        Map<String, Node> ds = new HashMap<>();
         for (;;) {
             if (!(currTok.kind == Kind.QVARID || currTok.kind == Kind.QCONID)) {
                 syntaxError("definition expected");
@@ -59,20 +70,17 @@ public class Parser extends AbstractSkReader {
             }
             accept(Kind.RESERVEDOP, "=");
             Node e = expression();
-            defns.put(s, ba.abs(args, e));
-            if (verbose) {
-                System.out.println(s + " = " + defns.get(s));
-                //System.out.println("no BA: " + e);
+            e = ba.abs(args, e);
+            e = ds.put(s, e);
+            if (e != null) {
+                syntaxError("duplicate definition: '" + s + "'");
             }
             if (currTok.kind != Kind.SEMI) {
                 break;
             }
             skip();
         }
-        in.close();
-        if (currTok.kind != Kind.EOF) {
-            syntaxError("EOF expected, but got " + currTok);
-        }
+        return ds;
     }
 
 /*
@@ -173,6 +181,10 @@ aexp        --> var con literal
                 return caseExpression();
             case "if":
                 return conditional();
+            case "let":
+                return let();
+            case "letrec":
+                return letrec();
             case "Pack":
                 return application();
             default:
@@ -183,6 +195,10 @@ aexp        --> var con literal
         }
         syntaxError("one of '\\', 'case', 'if', expression expected");
         return null;
+    }
+
+    private Node letrec() {
+        throw new AssertionError("letrec not yet implemented");
     }
 
     private Node lambda() throws IOException {
@@ -199,6 +215,26 @@ aexp        --> var con literal
         return ba.abs(xs, expression());
     }
 
+    private Node let() throws IOException {
+        skip();
+        accept(Kind.LBRACE);
+        Map<String, Node> ds = defns();
+        accept(Kind.RBRACE);
+        accept(Kind.RESERVEDID, "in");
+        Node body = expression();
+        List<String> xs = new ArrayList<>();
+        List<Node> es = new ArrayList<>();
+        for (Map.Entry<String, Node> e : ds.entrySet()) {
+            xs.add(e.getKey());
+            es.add(e.getValue());
+        }
+        body = ba.abs(xs, body);
+        for (Node e : es) {
+            body = appFactory.mkApp(body, e);
+        }
+        return body;
+    }
+    
     private Node application() throws IOException {
         Node e = aexpr(false);
         for (;;) {
@@ -312,7 +348,7 @@ aexp        --> var con literal
             if (alts.put(a.tag, a) != null) {
                 syntaxError("duplicate case tag");
             }
-            if (currTok.kind == Kind.RBRACE){
+            if (currTok.kind == Kind.RBRACE) {
                 break;
             }
             if (currTok.kind != Kind.SEMI) {
