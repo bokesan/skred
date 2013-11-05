@@ -100,7 +100,6 @@ abstract public class Function extends Node {
         register(new CombBs());
         register(I);
         register(K);
-        register(new CombU());
         register(new CombY());
         register(new CombW());
         register(K1);
