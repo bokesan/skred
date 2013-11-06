@@ -84,7 +84,7 @@ public class Lexer {
         for (;;) {
             int c = nextChar();
             CharClass cls = CharClass.classify(c);
-            if (cls != CharClass.ID && !Character.isDigit(c)) {
+            if (cls != CharClass.ID && !Character.isDigit(c) && cls != CharClass.CHAR) {
                 break;
             }
             b.appendCodePoint(c);
