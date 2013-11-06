@@ -190,6 +190,7 @@ aexp        --> var con literal
             default:
                 break;
             }
+            break;
         default:
             return application();
         }
@@ -197,8 +198,27 @@ aexp        --> var con literal
         return null;
     }
 
-    private Node letrec() {
-        throw new AssertionError("letrec not yet implemented");
+    private Node letrec() throws IOException {
+        skip();
+        accept(Kind.LBRACE);
+        Map<String, Node> ds = defns();
+        accept(Kind.RBRACE);
+        accept(Kind.RESERVEDID, "in");
+        Node body = expression();
+        List<String> xs = new ArrayList<>();
+        List<Node> es = new ArrayList<>();
+        for (Map.Entry<String, Node> e : ds.entrySet()) {
+            xs.add(e.getKey());
+            es.add(e.getValue());
+        }
+        if (xs.size() == 1) {
+            // only 1 binding
+            Node f = ba.abs(xs.get(0), body);
+            Node a = appFactory.mkApp(Function.valueOf("Y"), ba.abs(xs.get(0), es.get(0)));
+            return appFactory.mkApp(f, a);
+        } else {
+            throw new AssertionError("multiple letrec bindings not yet implemented");
+        }
     }
 
     private Node lambda() throws IOException {
