@@ -6,7 +6,7 @@ package de.bokeh.skred.red;
 class PrimLess extends Function {
 
     public PrimLess() {
-        super("<", 2);
+        super("lt", 2);
     }
 
     @Override

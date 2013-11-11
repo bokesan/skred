@@ -6,7 +6,7 @@ package de.bokeh.skred.red;
 class PrimGreaterEq extends Function {
 
     public PrimGreaterEq() {
-        super(">=", 2);
+        super("ge", 2);
     }
 
     @Override

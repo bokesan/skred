@@ -6,7 +6,7 @@ package de.bokeh.skred.red;
 class PrimRemInt extends Function {
 
     public PrimRemInt() {
-        super("%", 2);
+        super("rem", 2);
     }
 
     @Override

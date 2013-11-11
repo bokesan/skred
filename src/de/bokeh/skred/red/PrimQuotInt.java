@@ -1,12 +1,12 @@
 package de.bokeh.skred.red;
 
 /**
- * Int div
+ * Integer division
  */
-class PrimDivInt extends Function {
+class PrimQuotInt extends Function {
 
-    public PrimDivInt() {
-        super("/", 2);
+    public PrimQuotInt() {
+        super("quot", 2);
     }
 
     @Override

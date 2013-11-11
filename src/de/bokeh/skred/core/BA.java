@@ -63,7 +63,7 @@ public class BA {
             
             if (isB(a)) {
                 // S (K p) (B q r) = B* p q r
-                return appFactory.mkApp(Function.valueOf("B*"), f.getArg(), a.getFun().getArg(), a.getArg());
+                return appFactory.mkApp(Function.valueOf("Bs"), f.getArg(), a.getFun().getArg(), a.getArg());
             }
             
             // S (K p) q = B p q

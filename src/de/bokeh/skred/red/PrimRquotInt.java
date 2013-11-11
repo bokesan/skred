@@ -3,10 +3,10 @@ package de.bokeh.skred.red;
 /**
  * Int Rdiv
  */
-class PrimRdivInt extends Function {
+class PrimRquotInt extends Function {
 
-    public PrimRdivInt() {
-        super("Rdiv", 2);
+    public PrimRquotInt() {
+        super("Rquot", 2);
     }
 
     @Override

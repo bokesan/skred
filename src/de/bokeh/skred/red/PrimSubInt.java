@@ -6,7 +6,7 @@ package de.bokeh.skred.red;
 class PrimSubInt extends Function {
 
     public PrimSubInt() {
-        super("-", 2);
+        super("sub", 2);
     }
 
     @Override

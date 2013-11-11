@@ -103,6 +103,19 @@ aexp        --> var con literal
     private static final String[] REL_OPS = {
         "==", "/=", "<", ">", "<=", ">="
     };
+    
+    private static String relopName(String sym) {
+        switch (sym) {
+        case "==": return "eq";
+        case "/=": return "ne";
+        case "<" : return "lt";
+        case ">" : return "gt";
+        case "<=": return "le";
+        case ">=": return "ge";
+        default:
+            throw new IllegalArgumentException("invalid relop: " + sym);
+        }
+    }
 
     private boolean isOp(String[] ops) {
         return (currTok.kind == Kind.QVARSYM || currTok.kind == Kind.QCONSYM || currTok.kind == Kind.RESERVEDOP)
@@ -114,7 +127,7 @@ aexp        --> var con literal
         if (isOp(REL_OPS)) {
             String op = currTok.text;
             skip();
-            e = appFactory.mkApp(Function.valueOf(op), e, expr5());
+            e = appFactory.mkApp(Function.valueOf(relopName(op)), e, expr5());
         }
         return e;
     }
@@ -141,7 +154,7 @@ aexp        --> var con literal
     private Node expr6() throws IOException {
         Node e = expr7();
         while (isOp(new String[]{"+", "-"})) {
-            String op = currTok.text;
+            String op = currTok.text.equals("+") ? "add" : "sub";
             skip();
             e = appFactory.mkApp(Function.valueOf(op), e, expr7());
         }
@@ -151,7 +164,12 @@ aexp        --> var con literal
     private Node expr7() throws IOException {
         Node e = expr9();
         while (isOp(new String[]{"*", "/", "%"})) {
-            String op = currTok.text;
+            String op;
+            switch (currTok.text) {
+            case "*": op = "mul"; break;
+            case "/": op = "quot"; break;
+            default:  op = "rem"; break;
+            }
             skip();
             e = appFactory.mkApp(Function.valueOf(op), e, expr9());
         }

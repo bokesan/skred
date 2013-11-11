@@ -6,7 +6,7 @@ package de.bokeh.skred.red;
 class PrimEq extends Function {
 
     public PrimEq() {
-        super("==", 2);
+        super("eq", 2);
     }
 
     @Override

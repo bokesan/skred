@@ -9,7 +9,7 @@ package de.bokeh.skred.red;
 class CombBs extends Function {
 
     public CombBs() {
-        super("B*", 4);
+        super("Bs", 4);
     }
 
     @Override
