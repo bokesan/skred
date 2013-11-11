@@ -217,8 +217,21 @@ aexp        --> var con literal
             Node a = appFactory.mkApp(Function.valueOf("Y"), ba.abs(xs.get(0), es.get(0)));
             return appFactory.mkApp(f, a);
         } else {
-            throw new AssertionError("multiple letrec bindings not yet implemented");
+            Node f = ba.absMany(xs, appFactory.mkApp(Function.valueOf("K"), body));
+            Node es1 = appFactory.mkApp(Function.valueOf("K"), mkList(es));
+            Node a = appFactory.mkApp(Function.valueOf("Y"), ba.absMany(xs, es1));
+            return appFactory.mkApp(f, a);
         }
+    }
+
+    private Node mkList(List<Node> es) {
+        int n = es.size();
+        Node xs = Data.valueOf(0);
+        while (n > 0) {
+            n--;
+            xs = appFactory.mkApp(Function.primPack(1, 2), es.get(n), xs);
+        }
+        return xs;
     }
 
     private Node lambda() throws IOException {

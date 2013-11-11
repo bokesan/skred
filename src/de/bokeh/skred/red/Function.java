@@ -235,6 +235,15 @@ abstract public class Function extends Node {
         return f;
     }
 
+    private static Function cache(Function f) {
+        Function f1 = functionsByName.get(f.name);
+        if (f1 == null) {
+            f1 = f;
+            functionsByName.put(f.name, f);
+        }
+        return f1;
+    }
+
     public static Function primCase(int[] arities) {
         return primCase(arities, false);
     }
@@ -244,12 +253,14 @@ abstract public class Function extends Node {
     }
 
     private static Function primCase(int[] arities, boolean def) {
-        Function f = new PrimCase(arities, def);
-        Function f1 = functionsByName.get(f.name);
-        if (f1 == null) {
-            f1 = f;
-            functionsByName.put(f.name, f);
-        }
-        return f1;
+        return cache(new PrimCase(arities, def));
+    }
+    
+    public static Function primUnpack(int arity) {
+        return cache(new PrimUnpack(arity));
+    }
+
+    public static Function primGet(int index) {
+	return cache(new PrimGet(index));
     }
 }

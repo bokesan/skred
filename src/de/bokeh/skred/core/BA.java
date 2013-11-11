@@ -38,7 +38,18 @@ public class BA {
             }
         }
     }
-    
+
+    public Node absMany(List<String> xs, Node e) {
+        int n = xs.size();
+        if (n == 0) {
+            return e;
+        }
+        Node e1 = absMany(xs.subList(1, n), e);
+        Node e2 = abs(xs.get(0), e1);
+        // return appFactory.mkApp(Symbol.valueOf("U"), e2);
+        return appFactory.mkApp(Function.valueOf("S'"), e2, Function.primGet(0), Function.primGet(1));
+    }
+
     private Node opt(Node f, Node a) {
         if (isK(f)) {
             if (isK(a)) {
@@ -86,5 +97,5 @@ public class BA {
     private static boolean isB(Node e) {
         return e.isApp() && e.getFun().isApp() && e.getFun().getFun() == Function.valueOf("B");
     }
-    
+
 }

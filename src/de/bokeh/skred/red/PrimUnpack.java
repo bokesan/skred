@@ -1,33 +1,15 @@
 package de.bokeh.skred.red;
 
-import java.util.ArrayList;
-import java.util.List;
-
 
 public class PrimUnpack extends Function {
 
     private final int arity;
     
-    private PrimUnpack(int arity) {
+    public PrimUnpack(int arity) {
         super("unpack" + arity, 2);
         this.arity = arity;
     }
     
-    private static final List<Function> uncons = new ArrayList<>();
-    
-    public static Function of(int arity) {
-        int n = uncons.size();
-        while (n <= arity) {
-            if (n == 0) {
-                uncons.add(Function.valueOf("K"));
-            } else {
-                uncons.add(new PrimUnpack(n));
-            }
-            n++;
-        }
-        return uncons.get(arity);
-    }
-
     /*
      * unpack0 f C       = f
      * unpack1 f (C x)   = f x
@@ -35,11 +17,12 @@ public class PrimUnpack extends Function {
      * ...
      */
     
-    
     @Override
     Node exec(RedContext c) {
-        // we assume that C is already evaluated
         Node con = c.getArg2();
+        c.setTos(con);
+        c.eval();
+        con = c.getTos();
         Node f = c.getArg1();
         Node redex = c.get2();
         if (con.getNumFields() != arity) {
