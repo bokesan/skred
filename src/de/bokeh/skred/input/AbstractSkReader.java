@@ -28,13 +28,6 @@ abstract public class AbstractSkReader implements SkReader {
     //@Override
     public Node getGraph() throws SkFileCorruptException {
         linkDefn("main");
-        
-        for (String s : defns.keySet()) {
-            if (!rewritten.contains(s)) {
-                System.out.println("warning: unused symbol '" + s + "'");
-            }
-        }
-        
         return defns.get("main");
     }
 
