@@ -10,9 +10,11 @@ import de.bokeh.skred.red.Symbol;
 public class BA {
     
     private final AppFactory appFactory;
+    private final boolean useBStar;
 
-    public BA(AppFactory appFactory) {
+    public BA(AppFactory appFactory, boolean useBStar) {
         this.appFactory = appFactory;
+        this.useBStar = useBStar;
     }
     
     
@@ -60,10 +62,17 @@ public class BA {
                 // S (K p) I = p
                 return f.getArg();
             }
-            
-            if (isB(a)) {
-                // S (K p) (B q r) = B* p q r
-                return appFactory.mkApp(Function.valueOf("Bs"), f.getArg(), a.getFun().getArg(), a.getArg());
+
+            if (useBStar) {
+                if (isB(a)) {
+                    // S (K p) (B q r) = B* p q r
+                    return appFactory.mkApp(Function.valueOf("Bs"), f.getArg(), a.getFun().getArg(), a.getArg());
+                }
+            } else {
+                if (f.getArg().isApp()) {
+                    // S (K (p q)) r = B' p q r
+                    return appFactory.mkApp(Function.valueOf("B'"), f.getArg().getFun(), f.getArg().getArg(), a);
+                }
             }
             
             // S (K p) q = B p q

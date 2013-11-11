@@ -7,16 +7,18 @@ using combinator graph reduction.
 
     $ cat hello.core
     main = "Hello, World\n"
-    $ skred hello.core
+    $ java -jar skred.jar hello.core
     Hello, World
 
 ### Command options
 
---evalprojections
---noevalprojections
-
---app=Cond|IndI|ST
-
+Option | Description
+------ | -----------
+--evalprojections --noevalprojections | evaluate result of projection functions?
+--app=Cond\|IndI\|ST  |  choose implementation of overwriting.
+--stats=_file_ | report evaluation statistics in _file_.
+--noopt | don't do optimzations like `C add ==> add`.
+--useB1 | use B' instead of B* combinator
 
 
 ## The Core Language
@@ -32,10 +34,11 @@ There is also a bit more syntactic sugar.
 
 ### Data Types
 
-The core language has only two data types:
+The core language has only few data types:
 
 * Integers
 * Tagged structures
+* Functions
 
 Characters a represented by integers, everything else by structured data.
 

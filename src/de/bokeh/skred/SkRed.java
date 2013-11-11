@@ -17,23 +17,31 @@ public class SkRed {
     public static void main(String[] args) throws IOException {
         PrintWriter stats = null;
         List<String> programFiles = new ArrayList<String>();
-        AppFactory appFactory = new AppCondFactory();
         boolean evalProjections = true;
+        boolean useBStar = true;
+        boolean optimize = true;
+        String appFactoryId = "Cond";
         for (String s : args) {
             if (s.equals("--app=ST")) {
-                appFactory = new AppSTFactory();
+                appFactoryId = "ST";
             }
             else if (s.equals("--app=Cond")) {
-                appFactory = new AppCondFactory();
+                appFactoryId = "Cond";
             }
             else if (s.equals("--app=IndI")) {
-                appFactory = new AppIndIFactory();
+                appFactoryId = "IndI";
             }
             else if (s.equals("--noevalprojections")) {
                 evalProjections = false;
             }
             else if (s.equals("--evalprojections")) {
                 evalProjections = true;
+            }
+            else if (s.equals("--useB1")) {
+                useBStar = false;
+            }
+            else if (s.equals("--noopt")) {
+                optimize = false;
             }
             else if (s.startsWith("--stats=")) {
                 File statsFile = new File(s.substring(8));
@@ -42,8 +50,14 @@ public class SkRed {
                 programFiles.add(s);
             }
         }
+        AppFactory appFactory;
+        switch (appFactoryId) {
+        case "IndI": appFactory = new AppIndIFactory(optimize); break;
+        case "ST":   appFactory = new AppSTFactory(optimize); break;
+        default:     appFactory = new AppCondFactory(optimize); break;
+        }
         Function.init(evalProjections);
-        SkReader r = new Parser(appFactory);
+        SkReader r = new Parser(appFactory, useBStar);
         long startTime = System.nanoTime();
         for (String s : programFiles) {
             if (stats != null)

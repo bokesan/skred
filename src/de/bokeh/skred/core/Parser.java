@@ -29,10 +29,10 @@ public class Parser extends AbstractSkReader {
     
     private Lexeme currTok;
     
-    public Parser(AppFactory appFactory) {
+    public Parser(AppFactory appFactory, boolean useBStar) {
         super(appFactory);
         this.appFactory = appFactory;
-        this.ba = new BA(appFactory);
+        this.ba = new BA(appFactory, useBStar);
     }
 
     private void skip() throws IOException {

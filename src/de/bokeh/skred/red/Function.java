@@ -56,7 +56,7 @@ abstract public class Function extends Node {
     abstract Node exec(RedContext c);
 
     public String toString(int maxDepth) {
-        return name;
+        return getName();
     }
     
     // Factory
@@ -138,7 +138,7 @@ abstract public class Function extends Node {
     }
 
     private static void register(Function f) {
-        Function old = functionsByName.put(f.name, f);
+        Function old = functionsByName.put(f.getName(), f);
         assert old == null;
     }
     
@@ -183,7 +183,7 @@ abstract public class Function extends Node {
         ArrayList<Stats> st = new ArrayList<Stats>();
         for (Function f : functionsByName.values()) {
             if (f.evalCount + f.unwindCount > 0) {
-                st.add(new Stats(f.name, f.evalCount, f.unwindCount, f.argCheckCount));
+                st.add(new Stats(f.getName(), f.evalCount, f.unwindCount, f.argCheckCount));
             }
         }
         Collections.sort(st, new CmpStatsUnwindDesc());
@@ -236,10 +236,10 @@ abstract public class Function extends Node {
     }
 
     private static Function cache(Function f) {
-        Function f1 = functionsByName.get(f.name);
+        Function f1 = functionsByName.get(f.getName());
         if (f1 == null) {
             f1 = f;
-            functionsByName.put(f.name, f);
+            functionsByName.put(f.getName(), f);
         }
         return f1;
     }
@@ -262,5 +262,9 @@ abstract public class Function extends Node {
 
     public static Function primGet(int index) {
 	return cache(new PrimGet(index));
+    }
+
+    public String getName() {
+        return name;
     }
 }
