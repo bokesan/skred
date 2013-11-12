@@ -121,8 +121,32 @@ aexp        --> var con literal
         return (currTok.kind == Kind.QVARSYM || currTok.kind == Kind.QCONSYM || currTok.kind == Kind.RESERVEDOP)
                 && Lexer.contains(ops, currTok.text);
     }
-    
+
     private Node expression() throws IOException {
+        return expr2();
+    }
+    
+    private Node expr2() throws IOException {
+        List<Node> es = new ArrayList<>();
+        es.add(expr3());
+        while (currTok.kind == Kind.QVARSYM && "||".equals(currTok.text)) {
+            skip();
+            es.add(expr3());
+        }
+        return rassoc(Symbol.valueOf("or"), es);
+    }
+    
+    private Node expr3() throws IOException {
+        List<Node> es = new ArrayList<>();
+        es.add(expr4());
+        while (currTok.kind == Kind.QVARSYM && "&&".equals(currTok.text)) {
+            skip();
+            es.add(expr4());
+        }
+        return rassoc(Symbol.valueOf("and"), es);
+    }
+    
+    private Node expr4() throws IOException {
         Node e = expr5();
         if (isOp(REL_OPS)) {
             String op = currTok.text;
@@ -133,13 +157,18 @@ aexp        --> var con literal
     }
 
     private Node expr5() throws IOException {
-        List<Node> es = new ArrayList<>();
-        es.add(expr6());
-        while (currTok.kind == Kind.RESERVEDOP && ":".equals(currTok.text)) {
+        Node e1 = expr6();
+        if (currTok.kind == Kind.RESERVEDOP && ":".equals(currTok.text)) {
             skip();
-            es.add(expr6());
+            Node es = expr5();
+            return appFactory.mkApp(Function.primPack(1, 2), e1, es);
         }
-        return rassoc(Function.primPack(1, 2), es);
+        if (currTok.kind == Kind.QVARSYM && "++".equals(currTok.text)) {
+            skip();
+            Node es = expr5();
+            return appFactory.mkApp(Symbol.valueOf("append"), e1, es);
+        }
+        return e1;
     }
     
     private Node rassoc(Node f, List<Node> xs) {
