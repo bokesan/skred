@@ -33,6 +33,8 @@ and using `/=` instead of `~=` for inequality.
 
 There is also a bit more syntactic sugar.
 
+See the [test](../test) folder for some example core programs.
+
 ### Data Types
 
 The core language has only few data types:

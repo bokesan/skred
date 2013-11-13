@@ -11,7 +11,7 @@ Features:
 
 ## Documentation
 
-doc/usersguide.md
+See [the documentation](doc/usersguide.md). The [test](test) folder contains some sample programs.
 
 ## Installing
 
@@ -23,5 +23,5 @@ Do "ant jar" and move dist/skred.jar to a location of your choice.
 
 ## License
 
-skred is open source. It is distributed under a BSL-style license.
+skred is open source. It is distributed under the [MIT License](LICENSE).
 
