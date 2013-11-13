@@ -19,7 +19,7 @@ Do "ant jar" and move dist/skred.jar and possibly lib/prelude.core to a location
 
 ## Running core programs
 
-> java -jar skred.jar precude.core *your_program*.core
+> java -jar skred.jar *your_program*.core
 
 ## License
 
