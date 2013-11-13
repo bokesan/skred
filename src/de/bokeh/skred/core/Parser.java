@@ -51,7 +51,7 @@ public class Parser extends AbstractSkReader {
             syntaxError("EOF expected, but got " + currTok);
         }
         for (Map.Entry<String, Node> e : ds.entrySet()) {
-            defns.put(e.getKey(), e.getValue());
+            addDefn(e.getKey(), e.getValue());
         }
     }
 
@@ -265,20 +265,10 @@ aexp        --> var con literal
             return appFactory.mkApp(f, a);
         } else {
             Node f = ba.absMany(xs, appFactory.mkApp(Function.valueOf("K"), body));
-            Node es1 = appFactory.mkApp(Function.valueOf("K"), mkList(es));
+            Node es1 = appFactory.mkApp(Function.valueOf("K"), appFactory.mkList(es));
             Node a = appFactory.mkApp(Function.valueOf("Y"), ba.absMany(xs, es1));
             return appFactory.mkApp(f, a);
         }
-    }
-
-    private Node mkList(List<Node> es) {
-        int n = es.size();
-        Node xs = Data.valueOf(0);
-        while (n > 0) {
-            n--;
-            xs = appFactory.mkApp(Function.primPack(1, 2), es.get(n), xs);
-        }
-        return xs;
     }
 
     private Node lambda() throws IOException {
@@ -348,7 +338,7 @@ aexp        --> var con literal
             skip();
             return e;
         case LIT_STRING:
-            e = makeString(currTok.text);
+            e = Data.makeString(currTok.text);
             skip();
             return e;
         case LPAREN:
@@ -376,16 +366,6 @@ aexp        --> var con literal
         return Function.primPack(0, 0);
     }
 
-    private Node makeString(String s) {
-        Node r = Data.valueOf(0);
-        for (int i = s.length() - 1; i >= 0; i--) {
-            int c = s.charAt(i);
-            r = Data.valueOf(1, Int.valueOf(c), r);
-        }
-        return r;
-    }
-
-    
     private Node constructor() throws IOException {
         skip();
         accept(Kind.LBRACE);

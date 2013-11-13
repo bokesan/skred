@@ -30,7 +30,7 @@ public abstract class Data extends ValueNode {
     }
 
     // Factory part ------------------------------------------
-    
+
     public static Data valueOf(int tag) {
         switch (tag) {
         case 0: return Enum0;
@@ -59,5 +59,14 @@ public abstract class Data extends ValueNode {
     private static final Data Enum2 = new Data0(2);
     private static final Data Enum3 = new Data0(3);
     private static final Data Enum4 = new Data0(4);
+    
+    public static Data makeString(String s) {
+        Data r = valueOf(0);
+        for (int i = s.length() - 1; i >= 0; i--) {
+            int c = s.charAt(i);
+            r = valueOf(1, Int.valueOf(c), r);
+        }
+        return r;
+    }
 
 }

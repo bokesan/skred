@@ -32,7 +32,16 @@ public abstract class AppFactory {
     public Node mkApp(Node f, Node a) {
         if (optimize) {
             if (f == Function.C && a instanceof Function) {
+                // C op == rop
                 String r = getReverseOp(((Function)a).getName());
+                if (r != null) {
+                    return Function.valueOf(r);
+                }
+            }
+            else if (a == Function.getI() && f.isApp() && f.getFun() == Function.valueOf("C'")
+                    && f.getArg() instanceof Function) {
+                // C' op I == rop
+                String r = getReverseOp(((Function)f.getArg()).getName());
                 if (r != null) {
                     return Function.valueOf(r);
                 }
@@ -72,5 +81,15 @@ public abstract class AppFactory {
     }
 
     abstract protected Node newApp(Node fun, Node arg);
+
+    public Node mkList(List<Node> es) {
+        int n = es.size();
+        Node xs = Data.valueOf(0);
+        while (n > 0) {
+            n--;
+            xs = mkApp(Function.primPack(1, 2), es.get(n), xs);
+        }
+        return xs;
+    }
     
 }

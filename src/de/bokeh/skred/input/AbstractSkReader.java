@@ -15,17 +15,22 @@ import de.bokeh.skred.red.Symbol;
 abstract public class AbstractSkReader implements SkReader {
 
     protected final AppFactory appFactory;
-    protected final Map<String, Node> defns = new HashMap<String, Node>();
+    private final Map<String, Node> defns = new HashMap<String, Node>();
     private final Set<String> rewritten = new HashSet<String>();
 
     public AbstractSkReader(AppFactory appFactory) {
         this.appFactory = appFactory;
     }
     
-    //@Override
+    @Override
     abstract public void readDefns(File file) throws IOException;
 
-    //@Override
+    @Override
+    public void addDefn(String name, Node value) {
+        defns.put(name, value);
+    }
+
+    @Override
     public Node getGraph() throws SkFileCorruptException {
         linkDefn("main");
         return defns.get("main");
@@ -52,18 +57,19 @@ abstract public class AbstractSkReader implements SkReader {
                 e = d;
                 d = defns.get(e.toString());
             }
-            boolean builtin = false;
             if (d == null) {
                 d = Function.valueOf(e.toString());
-                builtin = true;
             }
             if (d == null)
                 throw new SkFileCorruptException("function " + e + " not found");
-            if (!builtin) {
+            if (!(d instanceof Function)) {
                 linkDefn(e.toString());
                 d = defns.get(e.toString());
+                if (d.isApp()) {
+                    return appFactory.mkApp(Function.I_FOR_IND, d);
+                }
             }
-            return appFactory.mkApp(Function.I_FOR_IND, d);
+            return d;
         }
         else if (e.isApp()) {
             e.overwriteApp(link(e.getFun()), link(e.getArg()));

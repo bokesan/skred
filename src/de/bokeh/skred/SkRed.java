@@ -16,12 +16,14 @@ public class SkRed {
 
     public static void main(String[] args) throws IOException {
         PrintWriter stats = null;
-        List<String> programFiles = new ArrayList<String>();
+        List<String> programFiles = new ArrayList<>();
+        List<String> cmdArgs = new ArrayList<>();
         boolean evalProjections = true;
         boolean useBStar = true;
         boolean optimize = true;
         String appFactoryId = "Cond";
-        for (String s : args) {
+        for (int i = 0; i < args.length; i++) {
+            String s = args[i];
             if (s.equals("--app=ST")) {
                 appFactoryId = "ST";
             }
@@ -46,6 +48,11 @@ public class SkRed {
             else if (s.startsWith("--stats=")) {
                 File statsFile = new File(s.substring(8));
                 stats = new PrintWriter(new FileOutputStream(statsFile));
+            } else if (s.equals("--")) {
+                i++;
+                for ( ; i < args.length; i++) {
+                    cmdArgs.add(args[i]);
+                }
             } else {
                 programFiles.add(s);
             }
@@ -58,6 +65,7 @@ public class SkRed {
         }
         Function.init(evalProjections);
         SkReader r = new Parser(appFactory, useBStar);
+        r.addDefn("cmdLine", makeStringList(cmdArgs, appFactory));
         long startTime = System.nanoTime();
         for (String s : programFiles) {
             if (stats != null)
@@ -156,6 +164,14 @@ public class SkRed {
             stats.format("elapsed: %.3f sec., %.3f Mrps\n", elapsed, 1.0e-6 * numReductions / elapsed);
             stats.close();
         }
+    }
+
+    private static Node makeStringList(List<String> cmdArgs, AppFactory appFactory) {
+        List<Node> args = new ArrayList<>();
+        for (String s : cmdArgs) {
+            args.add(Data.makeString(s));
+        }
+        return appFactory.mkList(args);
     }
 
     private static void printMemoryUsage(PrintWriter w, MemoryUsage m, String type) {

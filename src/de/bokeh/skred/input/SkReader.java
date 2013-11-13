@@ -10,4 +10,6 @@ public interface SkReader {
     
     public void readDefns(File file) throws IOException;
     
+    public void addDefn(String name, Node value);
+    
 }
