@@ -15,7 +15,7 @@ doc/usersguide.md
 
 ## Installing
 
-Do "ant jar" and move dist/skred.jar and possibly lib/prelude.core to a location of your choice.
+Do "ant jar" and move dist/skred.jar to a location of your choice.
 
 ## Running core programs
 
