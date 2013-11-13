@@ -15,9 +15,9 @@ using combinator graph reduction.
 Option | Description
 ------ | -----------
 --evalprojections --noevalprojections | evaluate result of projection functions?
---app=Cond\|IndI\|ST  |  choose implementation of overwriting.
+--app=Cond&#124;IndI&#124;ST  |  choose implementation of overwriting.
 --stats=_file_ | report evaluation statistics in _file_.
---noopt        | don't do optimzations like `C add ==> add`.
+--noopt        | don't do optimizations like `C add ==> add`.
 --useB1        | use B' instead of B* combinator
 --no-prelude   | don't load prelude.core
 
@@ -52,7 +52,7 @@ from 0. A data item with tag _t_ and _n_ fields is represented as
 
 ### Syntax
 
-A *program* is a list of definitions separated by semicolons
+A *program* is a list of definitions separated by semicolons.
 
 > program  =  defn { **;** defn }
 > defn     =  dname { pvar } **=** expression
@@ -67,12 +67,13 @@ In descending order of precedence:
 
 Operator | Function | Associativity
 -------- | -------- | -------------
-.        | B | right
-* / %       | mul quot rem | left
-+ -       | add sub | left
-:         | Pack{1,2}  | right
+.        | B        | right
+* / %    | mul quot rem | left
++ -      | add sub  | left
+: ++     | Pack{1,2} append | right
 = /= < <= > >= | eq ne lt le gt ge | non
-
+&&       | and      | right
+&#124;&#124; | or       | right
 
 
 ### Case Expressions
@@ -174,13 +175,13 @@ Rquot    | flip quot
 Rrem     | flip rem
 succ     | succ n -> n + 1
 pred     | pred n -> n - 1
-eq       | eq m n \| m = n -> Data{1} \| m ≠ n -> Data{0}
-ne       | ne m n \| m ≠ n -> Data{1} \| m = n -> Data{0}
-lt       | lt m n \| m < n -> Data{1} \| m ≥ n -> Data{0}
-le       | le m n \| m ≤ n -> Data{1} \| m > n -> Data{0}
-gt       | gt m n \| m > n -> Data{1} \| m ≤ n -> Data{0}
-ge       | ge m n \| m ≥ n -> Data{1} \| m < n -> Data{0}
-zero     | zero n \| n = 0 -> Data{1} \| m ≠ 0 -> Data{0}
+eq       | eq m n &#124; m = n -> Data{1} &#124; m ≠ n -> Data{0}
+ne       | ne m n &#124; m ≠ n -> Data{1} &#124; m = n -> Data{0}
+lt       | lt m n &#124; m < n -> Data{1} &#124; m ≥ n -> Data{0}
+le       | le m n &#124; m ≤ n -> Data{1} &#124; m > n -> Data{0}
+gt       | gt m n &#124; m > n -> Data{1} &#124; m ≤ n -> Data{0}
+ge       | ge m n &#124; m ≥ n -> Data{1} &#124; m < n -> Data{0}
+zero     | zero n &#124; n = 0 -> Data{1} &#124; m ≠ 0 -> Data{0}
 
 ### System functions
 
@@ -199,8 +200,8 @@ Pack{*t*,*n*} | Pack{*t*,*n*} x<sub>0</sub> … x<sub>n-1</sub> -> Data{*t*,x<su
 Case{*a0*,*a1*,...} | See section "Case Expressions"
 Unpack{_n_} | Unpack{_n_} f Data{_t_,x<sub>0</sub>,…} -> f x<sub>0</sub> … x<sub>n-1</sub>
 Get{_n_} | Get{_n_} Data{_t_,x<sub>0</sub>,…} -> x<sub>n</sub> | fst = get{0}; snd = get{1}
-tag      | tag Data{_t_,…} -> t \| tag _ -> -1   | tag; -1 for integers
-fields   | fields Data{_t_,x<sub>0</sub>,…,x<sub>n-1</sub>} -> n \| arity _ -> -1  | number of fields; -1 for integers
+tag      | tag Data{_t_,…} -> t &#124; tag _ -> -1   | tag; -1 for integers
+fields   | fields Data{_t_,x<sub>0</sub>,…,x<sub>n-1</sub>} -> n &#124; arity _ -> -1  | number of fields; -1 for integers
 
 The functions _tag_ and _fields_ can be used for type predicates:
 
