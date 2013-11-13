@@ -15,8 +15,19 @@ public final class AppST extends Node {
 	arg = a;
     }
     
+    @Override
     public boolean isApp() {
-        return true;
+        return state.isApp();
+    }
+    
+    @Override
+    public boolean isIndirection() {
+        return state.isIndirection();
+    }
+    
+    @Override
+    public boolean isHole() {
+        return state.isHole();
     }
 
     public Node getFun() {
@@ -64,6 +75,10 @@ public final class AppST extends Node {
         abstract void overwriteInd(AppST me, Node target);
         abstract void overwriteApp(AppST me, Node fun, Node arg);
         abstract String toString(AppST me, int maxDepth);
+        
+        boolean isApp() { return false; }
+        boolean isIndirection() { return false; }
+        boolean isHole() { return false; }
     }
 
     private static final NodeHandler APP_HANDLER = new AppHandler();
@@ -79,6 +94,9 @@ public final class AppST extends Node {
             c.push(me.fun);
             return null;
         }
+        
+        @Override
+        boolean isApp() { return true; }
 
         @Override
         Node getArg(AppST me) {
@@ -133,6 +151,9 @@ public final class AppST extends Node {
         }
         
         @Override
+        boolean isIndirection() { return true; }
+        
+        @Override
         Node getArg(AppST me) {
             throw new RedException("already updated");
         }
@@ -166,6 +187,9 @@ public final class AppST extends Node {
     }
     
     private static final class HoleHandler extends NodeHandler {
+        
+        @Override
+        boolean isHole() { return true; }
         
         @Override
         Node eval(AppST me, RedContext c) {

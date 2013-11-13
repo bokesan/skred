@@ -10,7 +10,15 @@ public class AppIndI extends Node {
     }
 
     public boolean isApp() {
-        return true;
+        return fun != null && fun != Function.I_FOR_IND;
+    }
+    
+    public boolean isIndirection() {
+        return fun == Function.I_FOR_IND;
+    }
+    
+    public boolean isHole() {
+        return fun == null;
     }
     
     public Node getFun() {

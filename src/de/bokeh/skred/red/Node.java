@@ -40,6 +40,14 @@ public abstract class Node {
         return false;
     }
     
+    public boolean isIndirection() {
+        return false;
+    }
+    
+    public boolean isHole() {
+        return false;
+    }
+    
     public int getTag() {
         throw new RedException("getTag not defined: " + this);
     }

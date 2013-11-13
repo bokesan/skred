@@ -385,12 +385,9 @@ aexp        --> var con literal
         Node c = expression();
         accept(Kind.RESERVEDID, "else");
         Node a = expression();
-        /*
+        
         // if p then c else a ==> case p of { <0> -> a; <1> -> c }
-        a = appFactory.mkApp(PrimUnpack.of(0), a);
-        c = appFactory.mkApp(PrimUnpack.of(0), c);
-        return appFactory.mkApp(PrimCase.of(2), a, c, p);
-        */
+        // return appFactory.mkApp(Function.primCase(new int[]{0,0}), a, c, p);
         
         return appFactory.mkApp(Function.valueOf("if"), c, a, p);
     }

@@ -15,7 +15,15 @@ public final class AppCond extends Node {
     }
 
     public boolean isApp() {
-        return true;
+        return arg != null && fun != null;
+    }
+    
+    public boolean isIndirection() {
+        return arg == null && fun != null;
+    }
+    
+    public boolean isHole() {
+        return fun == null;
     }
     
     public Node getFun() {

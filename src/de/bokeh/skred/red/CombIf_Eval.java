@@ -11,10 +11,10 @@ public class CombIf_Eval extends Function {
         c.setTos(c.getArg3());
         c.eval();
         Node result;
-        switch (c.getTos().getTag()) {
-        case 0: result = c.getArg2(); break;
-        case 1: result = c.getArg1(); break;
-        default: throw new RedException("type error: unexpected tag " + c.getTos());
+        if (c.getTos().getTag() == 0) {
+            result = c.getArg2();
+        } else {
+            result = c.getArg1();
         }
         c.set2(result);
         c.pop2();

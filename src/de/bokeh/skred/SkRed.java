@@ -18,7 +18,7 @@ public class SkRed {
         PrintWriter stats = null;
         List<String> programFiles = new ArrayList<>();
         List<String> cmdArgs = new ArrayList<>();
-        boolean evalProjections = true;
+        boolean evalProjections = false;
         boolean useBStar = true;
         boolean optimize = true;
         String appFactoryId = "Cond";
