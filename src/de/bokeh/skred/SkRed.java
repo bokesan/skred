@@ -21,6 +21,7 @@ public class SkRed {
         boolean evalProjections = false;
         boolean useBStar = true;
         boolean optimize = true;
+        boolean prelude = true;
         String appFactoryId = "Cond";
         for (int i = 0; i < args.length; i++) {
             String s = args[i];
@@ -32,6 +33,9 @@ public class SkRed {
             }
             else if (s.equals("--app=IndI")) {
                 appFactoryId = "IndI";
+            }
+            else if (s.equals("--no-prelude")) {
+                prelude = false;
             }
             else if (s.equals("--noevalprojections")) {
                 evalProjections = false;
@@ -67,10 +71,15 @@ public class SkRed {
         SkReader r = new Parser(appFactory, useBStar);
         r.addDefn("cmdLine", makeStringList(cmdArgs, appFactory));
         long startTime = System.nanoTime();
+        if (prelude) {
+            loadPrelude(r);
+        }
         for (String s : programFiles) {
             if (stats != null)
                 stats.println("loading " + s);
-            r.readDefns(new File(s));
+            BufferedReader in = new BufferedReader(new FileReader(s));
+            r.readDefns(in, s);
+            in.close();
         }
         double elapsed = (System.nanoTime() - startTime) * 1.0e-9;
         if (stats != null)
@@ -164,6 +173,20 @@ public class SkRed {
             stats.format("elapsed: %.3f sec., %.3f Mrps\n", elapsed, 1.0e-6 * numReductions / elapsed);
             stats.close();
         }
+    }
+
+    private static void loadPrelude(SkReader r) throws IOException {
+        InputStream s = SkRed.class.getResourceAsStream("/lib/prelude.core");
+        if (s == null) {
+            s = ClassLoader.getSystemResourceAsStream("prelude.core");
+        }
+        if (s == null) {
+            System.err.println("error: 'prelude.core' not found in classpath.");
+            System.exit(1);
+        }
+        BufferedReader in = new BufferedReader(new InputStreamReader(s));
+        r.readDefns(in, "prelude");
+        in.close();
     }
 
     private static Node makeStringList(List<String> cmdArgs, AppFactory appFactory) {

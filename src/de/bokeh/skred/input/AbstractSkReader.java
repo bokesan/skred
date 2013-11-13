@@ -1,7 +1,5 @@
 package de.bokeh.skred.input;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -21,9 +19,6 @@ abstract public class AbstractSkReader implements SkReader {
     public AbstractSkReader(AppFactory appFactory) {
         this.appFactory = appFactory;
     }
-    
-    @Override
-    abstract public void readDefns(File file) throws IOException;
 
     @Override
     public void addDefn(String name, Node value) {

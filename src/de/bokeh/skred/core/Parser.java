@@ -1,10 +1,7 @@
 package de.bokeh.skred.core;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -41,9 +38,8 @@ public class Parser extends AbstractSkReader {
     
     
     @Override
-    public void readDefns(File file) throws IOException {
-        BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
-        this.lex = new Lexer(in, file.getName());
+    public void readDefns(Reader in, String fileName) throws IOException {
+        this.lex = new Lexer(in, fileName);
         skip();
         Map<String, Node> ds = defns();
         in.close();

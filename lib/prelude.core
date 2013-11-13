@@ -22,12 +22,13 @@ subtract x y   =  y - x;
 even x	       =  x % 2 == 0;
 odd	       =  not . even;
 
-gcd x y	       =  if and (x==0) (y==0) then
+gcd x y	       =  if x==0 && y==0 then
 		     error "Prelude.gcd: gcd 0 0 is undefined"
 		  else
-		     gcd1 (abs x) (abs y);
-	gcd1 x y       =  if y==0 then x
-		          else gcd1 y (x % y);
+                     letrec {
+                       gcd1 x y =  if y==0 then x
+		                   else gcd1 y (x % y)
+	             } in gcd1 (abs x) (abs y);
 
 id x	       =  x;
 const c x      =  c;
@@ -72,11 +73,9 @@ isLower c = and ('a' <= c) (c <= 'z');
 isSpace c = or (c == ' ') (c == '\n');
 
 -- digitToInt :: Char -> Int
--- digitToInt c = code c - 48;
 digitToInt c = c - 48;
 
 -- digitToChar :: Int -> Char
--- digitToChar n = chr (n + 48);
 digitToChar n = 48 + n;
 
 
@@ -85,38 +84,57 @@ append lyst ys = case lyst of {
                    <0> -> ys;
                    <1> x xs -> x : append xs ys
                  };
-showsInt n s =
-  if n == 0 then '0' : s
-  else if n < 0 then '-' : i2s_ (negate n) s
-  else i2s_ n s;
 
-i2s_ n result = if n == 0 then result
-                else i2s_ (n / 10) (digitToChar (n % 10) : result);
+showsInt n s =
+  letrec { i2s n result =
+             if n == 0 then result
+             else i2s (n / 10) (digitToChar (n % 10) : result)
+  } in
+  if n == 0 then '0' : s
+  else if n < 0 then '-' : i2s (negate n) s
+  else i2s n s;
 
 showInt n = showsInt n "";
--- string_to_integer :: String -> (Int,String)
-s2i r cs = case cs of {
-             <0> -> r : cs;
-             <1> d ds -> if isDigit d then
-                         s2i (10*r + digitToInt d) ds
-                      else
-                         r : cs };
 
-string_to_integer c =
-   case dropWhile isSpace c of {
-     <0> -> error "A1";
-     <1> hd tl -> if hd == '-' then
-                     case tl of { <0> -> error "A2";
-                       <1> hr tr -> negate hr : tr }
-                  else if isDigit hd then
-                     s2i (digitToInt hd) tl
-                  else
-                     error "A3"
-   };
+-- readInt :: String -> [(Int, String)]
+readInt s =
+  letrec {
+    -- s2i :: Int -> String -> (Int, String)
+    s2i r s = case s of {
+                <0> -> Pack{0,2} r "";
+                <1> d ds -> if isDigit d then s2i (10 * r + digitToInt d) ds
+                            else Pack{0,2} r s
+              }
+  } in
+  letrec { pos s = case s of {
+                     <0> -> [];
+                     <1> d ds -> if isDigit d then (s2i (digitToInt d) ds : [])
+                                 else []
+                   }
+  } in
+  case dropWhile isSpace s of {
+    <0> -> [];
+    <1> d ds -> if d == '-' then
+                  map (\p -> case p of { <0> a b -> Pack{0,2} (negate a) b }) (pos ds)
+                else
+                  pos (d:ds)
+  };
+
+-- stringToInt :: String -> Int
+stringToInt s = case readInt s of {
+           <0> -> error "stringToInt: empty string";
+           <1> h t -> if not (null t) then error "stringToInt: multiple parses"
+                      else case h of {
+                             <0> f s -> if not (null s) then error "stringToInt: non-digits"
+                                        else f
+                           }
+         };
+
 
 -- reverse :: [a] -> [a]
-reverse xs = rev_ [] xs;
-   rev_ rs xs = case xs of { <0> -> rs; <1> h t -> rev_ (h:rs) t };
+reverse xs =
+  letrec { rev rs xs = case xs of { <0> -> rs; <1> h t -> rev (h:rs) t } }
+  in rev [] xs;
 
 -- concat :: [[a]] -> [a]
 concat = foldr append [];
@@ -189,7 +207,7 @@ format f a =
 		      (head (tail f)) == 'd' then
       		         showsInt (head a)
       		          (format (tail (tail f)) (tail a))
-                    else _ERROR 0)
+                    else error 0)
    else
       head f : format (tail f) a;
 

@@ -24,8 +24,6 @@
   <property name="cpd.minTokenCount" value="80" />
 
   <property name="test.dir" location="${build.dir}/test" />
-  <property name="test.data.dir" location="${test.dir}/data" />
-  <property name="test.reports.dir" location="${test.dir}/reports" />
 
   <path id="compile.classpath">
     <pathelement location="${classes.dir}" />
@@ -37,7 +35,6 @@
 
   <path id="test.classpath">
     <path refid="compile.classpath" />
-  	 <pathelement location="${env.JUNIT_HOME}/junit.jar" />
     <pathelement location="${test.dir}" />
   </path>
 
@@ -48,67 +45,17 @@
     <mkdir dir="${javadoc.dir}" />
   </target>
 
-  <target name="test-init">
-    <mkdir dir="${test.dir}" />
-    <delete dir="${test.data.dir}" />
-    <delete dir="${test.reports.dir}" />
-    <mkdir dir="${test.data.dir}" />
-    <mkdir dir="${test.reports.dir}" />
-  </target>
-
-
   <target name="compile" depends="init" description="Compile">
     <javac srcdir="src"
            destdir="${classes.dir}"
-	        source="1.5"
-	        target="1.5"
-    	     encoding="utf-8"
-	        debug="${build.debug}">
+	       source="7"
+	       target="7"
+           encoding="utf-8"
+	       debug="${build.debug}">
       <classpath refid="compile.classpath" />
       <compilerarg value="-Xlint:all" />
     </javac>
   	<copy file="version.properties" todir="${classes.dir}/de/bokeh/skred" />
-  </target>
-
-  <target name="test-compile" depends="compile,test-init" description="compile tests">
-    <javac destdir="${test.dir}"
-           debug="${build.debug}"
-           includeAntRuntime="true"
-           source="1.5"
-           target="1.5"
-    	   encoding="utf-8"
-           srcdir="test">
-      <classpath refid="test.classpath" />
-      <compilerarg value="-Xlint:all" />
-    </javac>
-    <copy file="version.properties" todir="${classes.dir}/de/magrathea/timebase/server" />
-  </target>
-
-  <target name="test" depends="test-compile" description="run tests">
-    <junit printsummary="withOutAndErr"
-           errorProperty="test.failed"
-           fork="true"
-           failureProperty="test.failed">
-      <classpath refid="test.classpath" />
-      <assertions>
-        <enable />
-      </assertions>
-      <formatter type="xml" />
-      <batchtest todir="${test.data.dir}">
-	    <fileset dir="${test.dir}" includes="**/*Test.class" />
-      </batchtest>
-    </junit>
-
-    <junitreport todir="${test.data.dir}">
-      <fileset dir="${test.data.dir}">
-        <include name="TEST-*.xml" />
-      </fileset>
-      <report format="frames"
-              todir="${test.reports.dir}" />
-    </junitreport>
-
-    <fail message="Tests failed. Review the reports."
-          if="test.failed" />
   </target>
 
   <target name="jar" depends="compile, manifest" description="create jar file">
@@ -118,35 +65,10 @@
         <include name="de/bokeh/**/*.class" />
         <include name="de/bokeh/**/*.properties" />
       </fileset>
-      <!--
       <fileset dir=".">
-        <include name="tbserver-context.xml" />
+        <include name="lib/prelude.core" />
       </fileset>
-      -->
     </jar>
-  </target>
-
-  <target name="dist" depends="jar" description="create distribution">
-    <zip destfile="${dist.dir}/tbserver-${version.build}.zip">
-      <zipfileset dir="${dist.dir}" prefix="lib">
-        <include name="*.jar" />
-      </zipfileset>
-      <zipfileset dir="lib" prefix="lib">
-        <include name="*.jar" />
-        <include name="log4jconfig.xml" />
-        <include name="wrapper.conf" />
-      	<include name="win32/*" />
-      	<include name="linux-x86/*" />
-      	<include name="linux-x64/*" />
-      	<include name="solaris-sparc-32/*" />
-      	<include name="solaris-sparc-64/*" />
-      </zipfileset>
-      <zipfileset dir="lib" prefix="log">
-        <include name="planproto.xsl" />
-        <include name="planproto.css" />
-        <include name="planproto.js" />
-      </zipfileset>
-    </zip>
   </target>
 
   <target name="manifest" depends="init" description="Manifest für tbserver.jar Datei erzeugen">
@@ -169,53 +91,13 @@
       <classpath refid="run.classpath" />
       <!-- <jvmarg value="-verbose" /> -->
       <jvmarg value="-server" />
-      <jvmarg value="-Xms128m" />
-      <jvmarg value="-Xmx128m" />
-      <jvmarg value="-Xss20m" />
       <jvmarg value="-ea" />
-      <jvmarg value="-Xfuture" />
       <arg value="--app=Cond" />
       <arg value="--noevalprojections" />
-      <arg value="../SK/fc/prelude.skc" />
-      <arg value="../SK/fc/primes.skc" />
+      <arg value="test/prelude.core" />
+      <arg value="test/primes.core" />
     </java>
   </target>
-
-  <target name="profile" depends="jar" description="Profiling">
-    <fail unless="netbeans.home">This target can only run inside the NetBeans IDE.</fail>
-    <nbprofiledirect>
-      <classpath refid="run.classpath" />
-    </nbprofiledirect>
-    <java classname="de.bokeh.skred.SkRed"
-          failonerror="true"
-          fork="true">
-      <classpath refid="run.classpath" />
-      <!-- <jvmarg value="-verbose" /> -->
-        <jvmarg value="-Xmx128m" />
-        <jvmarg value="-Xss20m" />
-      <jvmarg value="-ea" />
-      <jvmarg value="-Xfuture" />
-      <jvmarg value="${profiler.info.jvmargs.agent}" />
-        <arg value="--app=Cond" />
-        <arg value="--noevalprojections" />
-        <arg value="../SK/fc/prelude.skc" />
-        <arg value="../SK/fc/queens.skc" />
-    </java>
-  </target>
-
-  <target name="doc" depends="compile" description="create javadoc">
-    <javadoc destdir="${javadoc.dir}"
-             packagenames="de.bokeh.skred.*"
-             sourcepath="src"
-             source="1.5"
- 	     encoding="utf-8"
-             charset="UTF-8"
-	     locale="en_US"
-	     use="true">
-      <classpath refid="compile.classpath" />
-    </javadoc>
-  </target>
-
 
   <target name="clean" depends="init" description="Temporäre Build-Dateien löschen">
     <delete dir="${build.dir}" />
@@ -286,10 +168,8 @@
       </fileset>
     </pmd>
   </target>
-	
 
-
-    <target name="cpd" depends="compile" description="Doppelten Code finden">
+    <target name="cpd" depends="compile" description="Find duplicate code">
 	    <taskdef name="cpd" classname="net.sourceforge.pmd.cpd.CPDTask" classpathref="pmd.classpath" />
 	    <cpd minimumTokenCount="${cpd.minTokenCount}" outputFile="cpd1.txt">
 	        <fileset dir="src/">
@@ -307,41 +187,5 @@
 	        </fileset>
 	    </cpd>
 	</target>
-	
-	<target name="jdepend" depends="dist">
-
-	  <jdepend format="xml" outputfile="jdepend-report.xml">
-	      <exclude name="java.*"/>
-	      <exclude name="javax.*"/>
-	  	  <exclude name="org.*" />
-	  	  <exclude name="junit.*" />
-	  	  <exclude name="oracle.*" />
-	      <classespath>
-	        <pathelement location="dist/tbcommon.jar" />
-	        <pathelement location="dist/tbclient.jar" />
-	        <pathelement location="dist/tbserver.jar" />
-	      	<pathelement location="lib/TimeBaseOK.jar" />
-	      </classespath>
-	      <!-- <classpath location="classes" /> -->
-	  </jdepend>
-
-	  <style basedir="." destdir="."
-	         includes="jdepend-report.xml" 
-	         style="${ant.home}/etc/jdepend.xsl" />
-
-	</target>
-
-  <target name="checkstyle" depends="compile" description="Coding conventions überprüfen">
-    <taskdef resource="checkstyletask.properties"
-             classpath="/home/breitko/bin/checkstyle-4.3/checkstyle-all-4.3.jar" />
-    <checkstyle config="doc/style_checks.xml"
-              failureProperty="checkstyle.failure"
-              failOnViolation="false">
-      <formatter type="xml" tofile="checkstyle_report.xml" />
-      <fileset dir="src" includes="**/*.java" />
-    </checkstyle>
-    <style in="checkstyle_report.xml" out="checkstyle_report.html"
-           style="/home/breitko/bin/checkstyle-4.3/contrib/checkstyle-simple.xsl" />
-  </target>
 
 </project>

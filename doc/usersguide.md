@@ -17,8 +17,9 @@ Option | Description
 --evalprojections --noevalprojections | evaluate result of projection functions?
 --app=Cond\|IndI\|ST  |  choose implementation of overwriting.
 --stats=_file_ | report evaluation statistics in _file_.
---noopt | don't do optimzations like `C add ==> add`.
---useB1 | use B' instead of B* combinator
+--noopt        | don't do optimzations like `C add ==> add`.
+--useB1        | use B' instead of B* combinator
+--no-prelude   | don't load prelude.core
 
 
 ## The Core Language
@@ -167,8 +168,8 @@ mul      | mul m n -> m * n   | Integer multiplication
 quot     | Integer quotient
 rem      | Integer remainder
 Rsub     | Rsub m n -> n - m  | flip sub
-Rquot  | flip quot
-Rrem  | flip rem
+Rquot    | flip quot
+Rrem     | flip rem
 succ     | succ n -> n + 1
 pred     | pred n -> n - 1
 eq       | eq m n \| m = n -> Data{1} \| m ≠ n -> Data{0}
@@ -178,10 +179,15 @@ le       | le m n \| m ≤ n -> Data{1} \| m > n -> Data{0}
 gt       | gt m n \| m > n -> Data{1} \| m ≤ n -> Data{0}
 ge       | ge m n \| m ≥ n -> Data{1} \| m < n -> Data{0}
 zero     | zero n \| n = 0 -> Data{1} \| m ≠ 0 -> Data{0}
-error | *terminate program*
-stdPort | TODO
-read | TODO
 
+### System functions
+
+Function | Reduction rule | Remark
+-------- | -------------- | ------
+error    | *terminate program*
+stdPort  | TODO
+read     | TODO
+cmdLine  | -              | List of command line arguments
 
 ### Structured Data
 
@@ -189,8 +195,8 @@ Function | Reduction rule | Remark
 -------- | -------------- | ------
 Pack{*t*,*n*} | Pack{*t*,*n*} x<sub>0</sub> … x<sub>n-1</sub> -> Data{*t*,x<sub>0</sub>,…,x<sub>n-1</sub>} | Constructor
 Case{*a0*,*a1*,...} | See section "Case Expressions"
-unpack{_n_} | unpack{_n_} f Data{_t_,x<sub>0</sub>,…} -> f x<sub>0</sub> … x<sub>n-1</sub>
-get{_n_} | get{_n_} Data{_t_,x<sub>0</sub>,…} -> x<sub>n</sub> | fst = get{0}; snd = get{1}
+Unpack{_n_} | Unpack{_n_} f Data{_t_,x<sub>0</sub>,…} -> f x<sub>0</sub> … x<sub>n-1</sub>
+Get{_n_} | Get{_n_} Data{_t_,x<sub>0</sub>,…} -> x<sub>n</sub> | fst = get{0}; snd = get{1}
 tag      | tag Data{_t_,…} -> t \| tag _ -> -1   | tag; -1 for integers
 fields   | fields Data{_t_,x<sub>0</sub>,…,x<sub>n-1</sub>} -> n \| arity _ -> -1  | number of fields; -1 for integers
 
