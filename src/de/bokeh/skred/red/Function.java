@@ -63,7 +63,6 @@ abstract public class Function extends Node {
     
     private static final Map<String, Function> functionsByName = new HashMap<String, Function>();
     
-    private static Function LISTCASE;
     protected static final Function ERROR = new PrimError();
     private static Function I;
     /** I without eval for indirection. */
@@ -79,15 +78,11 @@ abstract public class Function extends Node {
             I = new CombI_Eval();
             K = new CombK_Eval();
             K1 = new CombK1_Eval();
-            LISTCASE = new CombListcase_Eval();
-            register(new PrimCompare0_Eval());
             register(new CombIf_Eval());
         } else {
             I = new CombI();
             K = new CombK();
             K1 = new CombK1();
-            LISTCASE = new CombListcase();
-            register(new PrimCompare0());
             register(new CombIf());
         }
         
@@ -122,13 +117,7 @@ abstract public class Function extends Node {
         register(new PrimNeq());
         register(new PrimZero());
         
-        register(new CombTypePred("boolean"));
-        register(new CombTypePred("pair"));
-        register(new CombTypePred("char"));
-        register(new CombTypePred("number"));
-        
         register(ERROR);
-        register(LISTCASE);
         register(new PrimRead());
         register(new PrimStdPort());
     }
@@ -209,13 +198,6 @@ abstract public class Function extends Node {
      */
     protected static Function getK1() {
         return K1;
-    }
-
-    /**
-     * @return the lISTCASE
-     */
-    protected static Function getLISTCASE() {
-        return LISTCASE;
     }
     
     public int getArity() {
