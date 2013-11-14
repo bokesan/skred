@@ -109,6 +109,7 @@ abstract public class Function extends Node {
         register(new PrimRsubInt());
         register(new PrimRquotInt());
         register(new PrimRremInt());
+        register(new PrimCompare());
         register(new PrimLess());
         register(new PrimLessEq());
         register(new PrimGreater());
