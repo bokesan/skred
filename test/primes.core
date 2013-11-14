@@ -3,7 +3,15 @@
 --
 
 -- main :: String
-main = showInts (take 1000 (sieve (enumFrom 2)));
+main = if numPrimes <= 0 then
+         showInts (sieve (enumFrom 2))
+       else
+         showInts (take numPrimes (sieve (enumFrom 2)));
+
+numPrimes = case cmdLine of {
+              <0>     -> 1000;
+              <1> n _ -> stringToInt n
+            };
 
 -- showInts :: [Int] -> String
 showInts = foldr (\n s -> showsInt n ('\n' : s)) "";

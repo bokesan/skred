@@ -1,4 +1,4 @@
-# skred users guide
+# skred user's guide
 
 *skred* implements a very simple lazy functional language called the *core language*
 using combinator graph reduction.
@@ -33,7 +33,8 @@ and using `/=` instead of `~=` for inequality.
 
 There is also a bit more syntactic sugar.
 
-See the [test](../test) folder for some example core programs.
+See the [prelude](../lib/prelude.core) and the [test](../test) folder for some
+example core programs.
 
 ### Data Types
 
@@ -175,6 +176,7 @@ Rquot    | flip quot
 Rrem     | flip rem
 succ     | succ n -> n + 1
 pred     | pred n -> n - 1
+compare  | compare m n &#124; m < n -> Data{0} &#124; m = n -> Data{1} &#124; m > n -> Data{2}
 eq       | eq m n &#124; m = n -> Data{1} &#124; m ≠ n -> Data{0}
 ne       | ne m n &#124; m ≠ n -> Data{1} &#124; m = n -> Data{0}
 lt       | lt m n &#124; m < n -> Data{1} &#124; m ≥ n -> Data{0}

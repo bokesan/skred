@@ -1,50 +1,81 @@
 --
 -- prelude.core
 --
--- Standard utility functions.
+-- Standard functions and support for built-in operators.
 --
--- All the character functions assume ASCII encoding.
+
+-- ----- Built-in operator support -----
 --
+-- The following definitions are needed for the operators &&, ||, and ++ to work.
+-- If you modifiy them, strange things will happen.
+
+-- "p && q" translates to "and p q"
+and p q	       =  if p then q else Pack{0,0};
+
+-- "p || q" translates to "or p q"
+or p q	       =  if p then Pack{1,0} else q;
+
+-- "xs ++ ys" translates to "append xs xs"
+append lyst ys = case lyst of {
+                   <0> -> ys;
+                   <1> x xs -> x : append xs ys
+                 };
+
+
+-- ----- Functions -----
+
+id x	       =  x;         -- I combinator
+const c _      =  c;         -- K combinator
+flip f x y     =  f y x;     -- C combinator
+-- function composition "f . g" is built-in syntax that translates to the B combinator
+
+-- until       :: (a -> Bool) -> (a -> a) -> a -> a
+until p f x    =  if p x then x else until p f (f x);
+
+
+
+-- ----- Booleans -----
 
 False = Pack{0,0};
 True  = Pack{1,0};
 
-stdin = _READ (_STD_PORT 0);
--- out_std s = cons (_STD_PORT 1) s;
--- out_err s = cons (_STD_PORT 2) s;
--- out_file f s = cons (output f) s;
+not p = if p then False else True;
 
+
+-- ----- Numbers -----
+--
+-- skred only supports 32-bit twos-complement integers
+--
+-- Built-in functions (with infix equivalent, if applicable):
+--
+-- add (+), sub (-), mul (*), quot (/), rem (%),
+-- eq (==), ne (/=), lt (<), le (<=), gt (>), ge (>=),
+-- compare.
+
+negate x       =  0 - x;
 max x y	       =  if x <= y then y else x;
 min x y	       =  if x <= y then x else y;
-negate x       =  0 - x;
 abs x	       =  if x < 0 then negate x else x;
 subtract x y   =  y - x;
 even x	       =  x % 2 == 0;
-odd	       =  not . even;
+odd x          =  x % 2 /= 0;
 
-gcd x y	       =  if x==0 && y==0 then
-		     error "Prelude.gcd: gcd 0 0 is undefined"
-		  else
-                     letrec {
-                       gcd1 x y =  if y==0 then x
-		                   else gcd1 y (x % y)
-	             } in gcd1 (abs x) (abs y);
+-- The compare functions returns one of these values (Ordering):
+LT = Pack{0,0};
+EQ = Pack{1,0};
+GT = Pack{2,0};
 
-id x	       =  x;
-const c x      =  c;
-flip f x y     =  f y x;
 
-not x	       =  if x then False else True;
-and x y	       =  if x then y else False;
-or x y	       =  if x then True else y;
--- otherwise      =  True;
+-- ----- Lists -----
+--
+-- The [] syntax and the : operator are built-in.
 
 null xs        =  case xs of { <0> -> True; _ -> False };
-head xs        =  case xs of { <0> -> error "head"; <1> h _ -> h };
-tail xs        =  case xs of { <0> -> error "tail"; <1> _ t -> t };
+head xs        =  case xs of { <0> -> error "head: empty list"; <1> h _ -> h };
+tail xs        =  case xs of { <0> -> error "tail: empty list"; <1> _ t -> t };
 
 last xs        =  case xs of {
-                    <0> -> error "last";
+                    <0> -> error "last: empty list";
                     <1> x xs -> case xs of {
                                   <0> -> x;
                                   _   -> last xs
@@ -52,7 +83,7 @@ last xs        =  case xs of {
                   };
 
 init xs        =  case xs of {
-                    <0> -> error "init";
+                    <0> -> error "init: empty list";
                     <1> x xs -> case xs of {
                                   <0> -> [];
                                   _   -> x : init xs
@@ -63,73 +94,6 @@ length xs      =  case xs of {
                     <0> -> 0;
                     <1> _ xs -> 1 + length xs
                   };
-
--- until       :: (a -> Bool) -> (a -> a) -> a -> a
-until p f x    =  if p x then x else until p f (f x);
-
--- isDigit isLower isSpace :: Char -> Bool
-isDigit c = and ('0' <= c) (c <= '9');
-isLower c = and ('a' <= c) (c <= 'z');
-isSpace c = or (c == ' ') (c == '\n');
-
--- digitToInt :: Char -> Int
-digitToInt c = c - 48;
-
--- digitToChar :: Int -> Char
-digitToChar n = 48 + n;
-
-
-
-append lyst ys = case lyst of {
-                   <0> -> ys;
-                   <1> x xs -> x : append xs ys
-                 };
-
-showsInt n s =
-  letrec { i2s n result =
-             if n == 0 then result
-             else i2s (n / 10) (digitToChar (n % 10) : result)
-  } in
-  if n == 0 then '0' : s
-  else if n < 0 then '-' : i2s (negate n) s
-  else i2s n s;
-
-showInt n = showsInt n "";
-
--- readInt :: String -> [(Int, String)]
-readInt s =
-  letrec {
-    -- s2i :: Int -> String -> (Int, String)
-    s2i r s = case s of {
-                <0> -> Pack{0,2} r "";
-                <1> d ds -> if isDigit d then s2i (10 * r + digitToInt d) ds
-                            else Pack{0,2} r s
-              }
-  } in
-  letrec { pos s = case s of {
-                     <0> -> [];
-                     <1> d ds -> if isDigit d then (s2i (digitToInt d) ds : [])
-                                 else []
-                   }
-  } in
-  case dropWhile isSpace s of {
-    <0> -> [];
-    <1> d ds -> if d == '-' then
-                  map (\p -> case p of { <0> a b -> Pack{0,2} (negate a) b }) (pos ds)
-                else
-                  pos (d:ds)
-  };
-
--- stringToInt :: String -> Int
-stringToInt s = case readInt s of {
-           <0> -> error "stringToInt: empty string";
-           <1> h t -> if not (null t) then error "stringToInt: multiple parses"
-                      else case h of {
-                             <0> f s -> if not (null s) then error "stringToInt: non-digits"
-                                        else f
-                           }
-         };
-
 
 -- reverse :: [a] -> [a]
 reverse xs =
@@ -193,25 +157,6 @@ foldr1 f xs = case xs of {
                             }
               };
 
-
--- format :: String -> [any] -> String
-format f a =
-   if
-      null f then []
-   else if
-      head f == '~' then
-      		   (if
-		      (head (tail f)) == 's' then
-      		         append (head a) (format (tail (tail f)) (tail a))
-                    else if
-		      (head (tail f)) == 'd' then
-      		         showsInt (head a)
-      		          (format (tail (tail f)) (tail a))
-                    else error 0)
-   else
-      head f : format (tail f) a;
-
-
 -- take :: Int -> [a] -> [a]
 take n xs = if n <= 0 then
               []
@@ -236,7 +181,6 @@ iterate f x = x : iterate f (f x);
 enumFrom = iterate succ;
 enumFromTo a b = takeWhile (\n -> b >= n) (enumFrom a);
 
-
 -- zipWith :: (a -> b -> c) -> [a] -> [b] -> [c]
 zipWith f xs ys =
   case xs of {
@@ -245,4 +189,107 @@ zipWith f xs ys =
                   <0> -> [];
                   <1> y ys -> f x y : zipWith f xs ys
                 }
-  }
+  };
+
+-- zip :: [a] -> [b] -> [(a,b)]
+zip = zipWith Pack{0,2};
+
+
+
+-- ----- Characters and Strings
+--
+-- Characters are represented as integers. Strings are lists of characters.
+--
+-- All the character functions assume ASCII encoding.
+
+isDigit c = '0' <= c && c <= '9';
+isLower c = 'a' <= c && c <= 'z';
+isSpace c = c == ' ' || c == '\n';
+
+digitToInt c = c - '0';
+digitToChar n = '0' + n;
+
+-- showsInt :: Int -> String -> String
+showsInt n s =
+  letrec { i2s n result =
+             if n == 0 then result
+             else i2s (n / 10) (digitToChar (n % 10) : result)
+  } in
+  if n == 0 then '0' : s
+  else if n < 0 then '-' : i2s (negate n) s
+  else i2s n s;
+
+showInt n = showsInt n "";
+
+-- readInt :: String -> [(Int, String)]
+readInt s =
+  letrec {
+    -- s2i :: Int -> String -> (Int, String)
+    s2i r s = case s of {
+                <0> -> Pack{0,2} r "";
+                <1> d ds -> if isDigit d then s2i (10 * r + digitToInt d) ds
+                            else Pack{0,2} r s
+              }
+  } in
+  letrec { pos s = case s of {
+                     <0> -> [];
+                     <1> d ds -> if isDigit d then (s2i (digitToInt d) ds : [])
+                                 else []
+                   }
+  } in
+  case dropWhile isSpace s of {
+    <0> -> [];
+    <1> d ds -> if d == '-' then
+                  map (\p -> case p of { <0> a b -> Pack{0,2} (negate a) b }) (pos ds)
+                else
+                  pos (d:ds)
+  };
+
+-- stringToInt :: String -> Int
+stringToInt s = case readInt s of {
+           <0> -> error "stringToInt: empty string";
+           <1> h t -> if not (null t) then error "stringToInt: multiple parses"
+                      else case h of {
+                             <0> f s -> if not (null s) then error "stringToInt: non-digits"
+                                        else f
+                           }
+         };
+
+
+-- format :: String -> [any] -> String
+format f a =
+   if
+      null f then []
+   else if
+      head f == '~' then
+      		   (if
+		      (head (tail f)) == 's' then
+      		         append (head a) (format (tail (tail f)) (tail a))
+                    else if
+		      (head (tail f)) == 'd' then
+      		         showsInt (head a)
+      		          (format (tail (tail f)) (tail a))
+                    else error 0)
+   else
+      head f : format (tail f) a;
+
+-- ----- Maybe -----
+
+Nothing = Pack{0,0};
+Just = Pack{1,1};
+
+mapMaybe f x = case x of {
+                 <0> -> Nothing;
+                 <1> v -> Just (f v)
+               };
+
+
+-- ----- IO and System -----
+
+-- cmdLine :: [String]  is built-in
+
+stdin = _READ (_STD_PORT 0)
+-- out_std s = cons (_STD_PORT 1) s;
+-- out_err s = cons (_STD_PORT 2) s;
+-- out_file f s = cons (output f) s;
+
