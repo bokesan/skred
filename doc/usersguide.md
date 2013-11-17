@@ -6,7 +6,7 @@ using combinator graph reduction.
 ## Running programs
 
     $ cat hello.core
-    main = "Hello, World\n"
+    main = putStr "Hello, World\n"
     $ java -jar skred.jar hello.core
     Hello, World
 
