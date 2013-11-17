@@ -1,4 +1,4 @@
-main = seqIO getLine            (\ln ->
-       seqIO' (putStr "> ")     (
-       seqIO' (putStrLn ln)     (
-       main)))
+main = seqIO getLine        $ \ln ->
+       seqIO' (putStr "> ") $
+       seqIO' (putStrLn ln) $
+       main

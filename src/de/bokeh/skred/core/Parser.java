@@ -119,7 +119,12 @@ aexp        --> var con literal
     }
 
     private Node expression() throws IOException {
-        return expr2();
+        Node e = expr2();
+        if (currTok.kind == Kind.QVARSYM && "$".equals(currTok.text)) {
+            skip();
+            e = appFactory.mkApp(e, expression());
+        }
+        return e;
     }
     
     private Node expr2() throws IOException {

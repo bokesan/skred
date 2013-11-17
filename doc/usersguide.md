@@ -75,6 +75,7 @@ Operator | Function | Associativity
 = /= < <= > >= | eq ne lt le gt ge | non
 &&       | and      | right
 &#124;&#124; | or       | right
+$        | function application | right
 
 
 ### Case Expressions
