@@ -288,8 +288,41 @@ mapMaybe f x = case x of {
 
 -- cmdLine :: [String]  is built-in
 
-stdin = _READ (_STD_PORT 0)
--- out_std s = cons (_STD_PORT 1) s;
--- out_err s = cons (_STD_PORT 2) s;
--- out_file f s = cons (output f) s;
+returnIO = Pack{0,2};
 
+seqIO a b w = case a w of {
+                <0> v w' -> b v w;
+                err -> err
+            };
+
+seqIO' a b = seqIO a (const b);
+
+stdin = primStdPort 0;
+stdout = primStdPort 1;
+stderr = primStdPort 2;
+
+hGetLine h =
+  seqIO (hGetChar h)
+        (\c -> if c == 10 then
+                 returnIO ""
+               else seqIO (hGetLine h) (\cs -> returnIO (c:cs)));
+
+getLine = hGetLine stdin;
+
+getContents = hGetContents stdin;
+
+hGetContents h = returnIO (_READ h);
+
+-- hPutStrLn :: Handle -> String -> IO ()
+hPutStr h s = case s of {
+                <0> -> returnIO Pack{0,0};
+                <1> c cs -> seqIO' (hPutChar h c) (hPutStr h cs)
+              };
+
+hPutStrLn h s = seqIO' (hPutStr h s) (hPutChar h '\n');
+
+putStr = hPutStr stdout;
+putStrLn = hPutStrLn stdout;
+
+-- interact :: (String -> String) -> IO ()
+interact f = seqIO getContents (\s -> putStr (f s))

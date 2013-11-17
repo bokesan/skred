@@ -4,9 +4,9 @@
 
 -- main :: String
 main = if numPrimes <= 0 then
-         showInts (sieve (enumFrom 2))
+         putStr (showInts (sieve (enumFrom 2)))
        else
-         showInts (take numPrimes (sieve (enumFrom 2)));
+         putStr (showInts (take numPrimes (sieve (enumFrom 2))));
 
 numPrimes = case cmdLine of {
               <0>     -> 1000;

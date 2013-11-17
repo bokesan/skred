@@ -121,6 +121,8 @@ abstract public class Function extends Node {
         register(ERROR);
         register(new PrimRead());
         register(new PrimStdPort());
+        register(new PrimPutChar());
+        register(new PrimGetChar());
     }
     
     public static Function valueOf(String name) {

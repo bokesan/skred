@@ -1,0 +1,4 @@
+main = interact (map toUpper);
+
+toUpper c = if c < 'a' || c > 'z' then c
+            else c - ('a' - 'A')

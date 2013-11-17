@@ -63,11 +63,12 @@ dfs next xs = case xs of {
 --                 (\y ys -> y : bfs next (ys ++ next y)) xs;
 
 
--- main :: String
--- main = doit stdin;
-main = if length cmdLine /= 1 then
-         "usage: Queens <n>\n"
+
+main = putStrLn doit;
+
+doit = if length cmdLine /= 1 then
+         "usage: Queens <n>"
        else
          let { s = head cmdLine } in
          let { n = stringToInt s } in
-         "Queens " ++ s ++ ": " ++ showsInt (length (depthQueen n)) " solutions.\n"
+         "Queens " ++ s ++ ": " ++ showsInt (length (depthQueen n)) " solutions."

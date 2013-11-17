@@ -85,32 +85,12 @@ public class SkRed {
         if (stats != null)
             stats.format("load time: %.3f seconds.\n", elapsed);
         RedContext c = new RedContext(appFactory);
-        c.push(r.getGraph());
+        c.push(appFactory.mkApp(r.getGraph("main"), Int.valueOf(0)));
         r = null;
         startTime = System.nanoTime();
-        for (;;) {
-            c.eval();
-            Node x = c.getTos();
-            if (!(x instanceof Data))
-                break;
-            Data p = (Data) x;
-            if (p.getTag() != 1 || p.getNumFields() != 2) {
-                if (p.getTag() != 0 || p.getNumFields() != 0) {
-                    System.out.println("unexpected result: " + p.toString(5));
-                }
-                break;
-            }
-            c.push(p.getField(0));
-            c.eval();
-            Node ch = c.getTos();
-            int char_ = ch.intValue();
-            if (char_ <= 0) {
-                System.out.println("invalid char: " + char_);
-            } else {
-                System.out.print((char) char_);
-            }
-            c.pop1();
-            c.setTos(p.getField(1));
+        c.eval();
+        if (c.getTos().getTag() != 0) {
+            System.err.println("IO error: " + c.getTos());
         }
         if (stats != null) {
             elapsed = (System.nanoTime() - startTime) * 1.0e-9;

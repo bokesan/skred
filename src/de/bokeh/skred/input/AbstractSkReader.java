@@ -26,9 +26,9 @@ abstract public class AbstractSkReader implements SkReader {
     }
 
     @Override
-    public Node getGraph() throws SkFileCorruptException {
-        linkDefn("main");
-        return defns.get("main");
+    public Node getGraph(String name) throws SkFileCorruptException {
+        linkDefn(name);
+        return defns.get(name);
     }
 
     private void linkDefn(String name) throws SkFileCorruptException {

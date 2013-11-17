@@ -185,13 +185,15 @@ gt       | gt m n &#124; m > n -> Data{1} &#124; m ≤ n -> Data{0}
 ge       | ge m n &#124; m ≥ n -> Data{1} &#124; m < n -> Data{0}
 zero     | zero n &#124; n = 0 -> Data{1} &#124; m ≠ 0 -> Data{0}
 
-### System functions
+### IO and System
 
 Function | Reduction rule | Remark
 -------- | -------------- | ------
 error    | *terminate program*
-stdPort  | TODO
-read     | TODO
+primStdPort | TODO
+hPutChar | hPutChar h c w -> Data{0,Data{0},w'} &#124; ioError
+hGetChar | hGetChar h w -> Data{0,c,w'} &#124; ioError
+_READ    | TODO
 cmdLine  | -              | List of command line arguments
 
 ### Structured Data

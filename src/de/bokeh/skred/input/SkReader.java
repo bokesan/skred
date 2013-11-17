@@ -7,7 +7,7 @@ import de.bokeh.skred.red.Node;
 
 public interface SkReader {
 
-    public Node getGraph() throws SkFileCorruptException;
+    public Node getGraph(String name) throws SkFileCorruptException;
     
     public void readDefns(Reader in, String fileName) throws IOException;
     
