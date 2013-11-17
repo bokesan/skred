@@ -297,6 +297,19 @@ seqIO a b w = case a w of {
 
 seqIO' a b = seqIO a (const b);
 
+doIO actions z = case actions of {
+                   <0> -> returnIO z;
+                   <1> x xs -> seqIO (x z) (doIO xs)
+                 };
+
+doIO' actions = case actions of {
+                  <0> -> error "doIO': no actions";
+                  <1> a1 r -> case r of {
+                                <0> -> a1;
+                                _   -> seqIO' a1 (doIO' r)
+                              }
+                };
+
 stdin = primStdPort 0;
 stdout = primStdPort 1;
 stderr = primStdPort 2;

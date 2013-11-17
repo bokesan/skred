@@ -1,0 +1,6 @@
+main = printInts (foo 7);
+
+foo x = map (\x -> x + x) [1,2,3,4,5,6,x,8,9,10];
+
+printInts ns = doIO' (map (\n -> putStrLn (showInt n)) ns)
+

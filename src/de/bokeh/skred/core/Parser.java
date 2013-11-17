@@ -356,10 +356,17 @@ aexp        --> var con literal
     
 
     private Node parseList() throws IOException {
-        // TODO
         skip();
-        accept(Kind.RBRACKET);
-        return Function.primPack(0, 0);
+        List<Node> es = new ArrayList<>();
+        while (currTok.kind != Kind.RBRACKET) {
+            es.add(expression());
+            if (currTok.kind == Kind.COMMA) {
+                skip();
+            }
+        }
+        skip();
+        es.add(Data.valueOf(0));
+        return rassoc(Function.primPack(1, 2), es);
     }
 
     private Node constructor() throws IOException {
