@@ -212,12 +212,14 @@ digitToChar n = '0' + n;
 -- showsInt :: Int -> String -> String
 showsInt n s =
   letrec { i2s n result =
-             if n == 0 then result
+             if 0 == n then result
              else i2s (n / 10) (digitToChar (n % 10) : result)
   } in
-  if n == 0 then '0' : s
-  else if n < 0 then '-' : i2s (negate n) s
-  else i2s n s;
+  case compare 0 n of {
+    <0> -> i2s n s;
+    <1> -> '0' : s;
+    <2> -> '-' : i2s (negate n) s
+  };
 
 showInt n = showsInt n "";
 

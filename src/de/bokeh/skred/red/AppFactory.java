@@ -57,6 +57,15 @@ public abstract class AppFactory {
             else if (f == Function.getK1()) {
                 return Function.getI();
             }
+            else if (f == Function.valueOf("add") && a == Int.valueOf(1)) {
+                return Function.valueOf("succ");
+            }
+            else if (f == Function.valueOf("Rsub") && a == Int.valueOf(1)) {
+                return Function.valueOf("pred");
+            }
+            else if (f == Function.valueOf("eq") && a == Int.valueOf(0)) {
+                return Function.valueOf("zero");
+            }
         }
         return newApp(f, a);
     }
