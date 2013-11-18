@@ -25,7 +25,7 @@ public final class Int extends ValueNode {
 	return value;
     }
 
-    public String toString(int d) {
+    public String toString(boolean parens, int d) {
 	return Integer.toString(value);
     }
 

@@ -18,7 +18,7 @@ public class InputPort extends ValueNode {
         }
     }
     
-    public String toString(int d) {
+    public String toString(boolean parens, int d) {
         return "InputPort[" + in + "]";
     }
     

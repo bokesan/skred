@@ -62,8 +62,8 @@ public final class AppST extends Node {
     }
 
     @Override
-    public String toString(int maxDepth) {
-        return state.toString(this, maxDepth);
+    public String toString(boolean parens, int maxDepth) {
+        return state.toString(this, parens, maxDepth);
     }
    
     abstract private static class NodeHandler {
@@ -74,7 +74,7 @@ public final class AppST extends Node {
         abstract void overwriteHole(AppST me);
         abstract void overwriteInd(AppST me, Node target);
         abstract void overwriteApp(AppST me, Node fun, Node arg);
-        abstract String toString(AppST me, int maxDepth);
+        abstract String toString(AppST me, boolean parens, int maxDepth);
         
         boolean isApp() { return false; }
         boolean isIndirection() { return false; }
@@ -130,12 +130,16 @@ public final class AppST extends Node {
             me.arg = null;
         }
 
-        String toString(AppST me, int d) {
+        String toString(AppST me, boolean parens, int d) {
             if (d <= 0) {
                 return "?";
             }
             d--;
-            return "(" + me.fun.toString(d) + " " + me.arg.toString(d) + ")";
+            if (parens) {
+                return "(" + me.fun.toString(false, d) + " " + me.arg.toString(true, d) + ")";
+            } else {
+                return me.fun.toString(false, d) + " " + me.arg.toString(true, d);
+            }
         }
     }
     
@@ -178,11 +182,11 @@ public final class AppST extends Node {
             throw new RedException("tried to overwrite ind node");
         }
 
-        String toString(AppST me, int d) {
+        String toString(AppST me, boolean parens, int d) {
             if (d <= 0) {
                 return "^?";
             }
-            return "^" + me.fun.toString(d - 1);
+            return "^" + me.fun.toString(true, d - 1);
         }
     }
     
@@ -229,7 +233,7 @@ public final class AppST extends Node {
             throw new RedException("unwind of hole");
         }
 
-        String toString(AppST me, int d) {
+        String toString(AppST me, boolean parens, int d) {
             return "#HOLE";
         }
     }

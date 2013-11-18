@@ -17,11 +17,11 @@ public abstract class Node {
     
     abstract public Node getArg();
     
-    abstract public String toString(int maxDepth);
+    abstract public String toString(boolean parens, int maxDepth);
     
     @Override
     public String toString() {
-        return toString(12);
+        return toString(false, 12);
     }
 
     public Node getFun() {

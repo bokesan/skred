@@ -15,7 +15,7 @@ public class OutputPort extends ValueNode {
     }
 
     @Override
-    public String toString(int maxDepth) {
+    public String toString(boolean parens, int maxDepth) {
         return "OutputPort[" + out + "]";
     }
 

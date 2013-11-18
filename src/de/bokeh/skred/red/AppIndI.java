@@ -65,15 +65,20 @@ public class AppIndI extends Node {
     }
 
     @Override
-    public String toString(int d) {
+    public String toString(boolean parens, int d) {
         if (d <= 0) {
             return "?";
         }
         d--;
         if (fun == Function.I_FOR_IND)
-            return "^" + fun.toString(d);
-        if (arg != null)
-            return "(" + fun.toString(d) + " " + arg.toString(d) + ")";
+            return "^" + fun.toString(true, d);
+        if (arg != null) {
+            if (parens) {
+                return "(" + fun.toString(false, d) + " " + arg.toString(true, d) + ")";
+            } else {
+                return fun.toString(false, d) + " " + arg.toString(true, d);
+            }
+        }
         return "#HOLE";
     }
 

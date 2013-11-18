@@ -90,15 +90,20 @@ public final class AppCond extends Node {
     }
 
     @Override
-    public String toString(int d) {
+    public String toString(boolean parens, int d) {
         if (d <= 0) {
             return "?";
         }
         d--;
-        if (arg != null)
-            return "(" + fun.toString(d) + " " + arg.toString(d) + ")";
+        if (arg != null) {
+            if (parens) {
+                return "(" + fun.toString(false, d) + " " + arg.toString(true, d) + ")";
+            } else {
+                return fun.toString(false, d) + " " + arg.toString(true, d);
+            }
+        }
         if (fun != null)
-            return "^" + fun.toString(d);
+            return "^" + fun.toString(true, d);
         return "#HOLE";
     }
    

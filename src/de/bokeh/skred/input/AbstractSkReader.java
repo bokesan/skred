@@ -40,7 +40,7 @@ abstract public class AbstractSkReader implements SkReader {
                     printed.add(d);
                     out.print(d);
                     out.print(" = ");
-                    out.print(e.toString(Integer.MAX_VALUE));
+                    out.print(e.toString(false, Integer.MAX_VALUE));
                     out.println(';');
                     for (String v : freeVars(e)) {
                         if (!printed.contains(v) && Function.valueOf(v) == null) {

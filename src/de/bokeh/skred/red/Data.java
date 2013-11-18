@@ -14,7 +14,13 @@ public abstract class Data extends ValueNode {
     }
     
     @Override
-    public String toString(int maxDepth) {
+    public String toString(boolean parens, int maxDepth) {
+        if (getTag() == 1 && isProperList()) {
+            if (isPrintableString()) {
+                return toStringRep();
+            }
+            return toListString(maxDepth - 1);
+        }
         StringBuilder b = new StringBuilder("#");
         b.append(tag);
         b.append('{');
@@ -27,6 +33,63 @@ public abstract class Data extends ValueNode {
         }
         b.append('}');
         return b.toString();
+    }
+
+    private String toStringRep() {
+        StringBuilder b = new StringBuilder();
+        b.append('"');
+        Node d = this;
+        while (d.getTag() != 0) {
+            char c = (char) d.getField(0).intValue();
+            if (c == '\\' || c == '"') {
+                b.append('\\');
+            }
+            b.append(c);
+            d = d.getField(1);
+        }
+        b.append('"');
+        return b.toString();
+    }
+
+    private boolean isPrintableString() {
+        if (getTag() == 0 && getNumFields() == 0) {
+            return true;
+        }
+        if (getTag() == 1 && getNumFields() == 2) {
+            Node v = getField(0);
+            if (!(v instanceof Int && v.intValue() >= 32 && v.intValue() <= 126)) {
+                return false;
+            }
+            Node t = getField(1);
+            return (t instanceof Data) && ((Data) t).isProperList();
+        }
+        return false;
+    }
+
+    private String toListString(int depth) {
+        StringBuilder b = new StringBuilder();
+        b.append('[');
+        Data d = this;
+        String sep = "";
+        while (d.getTag() != 0) {
+            b.append(sep);
+            sep = ", ";
+            b.append(d.getField(0).toString(false, depth));
+            d = (Data) d.getField(1);
+        }
+        b.append(']');
+        return b.toString();
+    }
+
+    private boolean isProperList() {
+        if (getTag() == 0 && getNumFields() == 0) {
+            return true;
+        }
+        if (getTag() == 1 && getNumFields() == 2) {
+            Node t = getField(1);
+            return (t instanceof Data) && ((Data) t).isProperList();
+        }
+        return false;
     }
 
     // Factory part ------------------------------------------
