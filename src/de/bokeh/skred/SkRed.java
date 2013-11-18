@@ -22,6 +22,7 @@ public class SkRed {
         boolean useBStar = true;
         boolean optimize = true;
         boolean prelude = true;
+        boolean justCompile = false;
         String appFactoryId = "Cond";
         for (int i = 0; i < args.length; i++) {
             String s = args[i];
@@ -48,6 +49,9 @@ public class SkRed {
             }
             else if (s.equals("--noopt")) {
                 optimize = false;
+            }
+            else if (s.equals("--compile")) {
+                justCompile = true;
             }
             else if (s.startsWith("--stats=")) {
                 File statsFile = new File(s.substring(8));
@@ -84,6 +88,10 @@ public class SkRed {
         double elapsed = (System.nanoTime() - startTime) * 1.0e-9;
         if (stats != null)
             stats.format("load time: %.3f seconds.\n", elapsed);
+        if (justCompile) {
+            r.dumpDefns("main", System.out);
+            return;
+        }
         RedContext c = new RedContext(appFactory);
         c.push(appFactory.mkApp(r.getGraph("main"), Int.valueOf(0)));
         r = null;

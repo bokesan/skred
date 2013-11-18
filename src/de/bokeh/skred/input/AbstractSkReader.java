@@ -1,11 +1,15 @@
 package de.bokeh.skred.input;
 
+import java.io.PrintStream;
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import de.bokeh.skred.red.AppFactory;
+import de.bokeh.skred.red.Data;
 import de.bokeh.skred.red.Function;
 import de.bokeh.skred.red.Node;
 import de.bokeh.skred.red.Symbol;
@@ -18,6 +22,56 @@ abstract public class AbstractSkReader implements SkReader {
 
     public AbstractSkReader(AppFactory appFactory) {
         this.appFactory = appFactory;
+    }
+    
+    @Override
+    public void dumpDefns(String root, PrintStream out) {
+        Set<String> printed = new HashSet<>();
+        Deque<String> toPrint = new ArrayDeque<>();
+        toPrint.push(root);
+        while (!toPrint.isEmpty()) {
+            String d = toPrint.pop();
+            if (!printed.contains(d)) {
+                Node e = defns.get(d);
+                if (e == null) {
+                    System.err.println("error: undefined: " + d);
+                    System.exit(1);
+                } else {
+                    printed.add(d);
+                    out.print(d);
+                    out.print(" = ");
+                    out.print(e.toString(Integer.MAX_VALUE));
+                    out.println(';');
+                    for (String v : freeVars(e)) {
+                        if (!printed.contains(v) && Function.valueOf(v) == null) {
+                            toPrint.push(v);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private static Set<String> freeVars(Node e) {
+        Set<String> result = new HashSet<>();
+        freeVars(result, e);
+        return result;
+    }
+
+    private static void freeVars(Set<String> result, Node e) {
+        while (e.isApp()) {
+            freeVars(result, e.getArg());
+            e = e.getFun();
+        }
+        if (e instanceof Symbol) {
+            result.add(e.toString());
+        }
+        else if (e instanceof Data) {
+            Data d = (Data) e;
+            for (int i = d.getNumFields() - 1; i >= 0; i--) {
+                freeVars(result, d.getField(i));
+            }
+        }
     }
 
     @Override
