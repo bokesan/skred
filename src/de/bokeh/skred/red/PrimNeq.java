@@ -17,9 +17,7 @@ class PrimNeq extends Function {
         c.eval();
         Node a2 = c.getTos();
         Node a1 = c.get1();
-        int n1 = a1.intValue();
-        int n2 = a2.intValue();
-        boolean r = n1 != n2;
+        boolean r = !a1.intValue().equals(a2.intValue());
         Node result = Data.valueOf(r?1:0);
         c.pop2();
         c.getTos().overwriteInd(result);

@@ -1,5 +1,7 @@
 package de.bokeh.skred.red;
 
+import java.math.BigInteger;
+
 /**
  * A graph node.
  */
@@ -28,7 +30,7 @@ public abstract class Node {
         throw new RedException("not an application node: " + this);
     }
     
-    public int intValue() {
+    public BigInteger intValue() {
         throw new RedException("intValue not defined: " + this);
     }
     

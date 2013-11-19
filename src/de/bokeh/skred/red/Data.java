@@ -1,5 +1,7 @@
 package de.bokeh.skred.red;
 
+import java.math.BigInteger;
+
 public abstract class Data extends ValueNode {
 
     private final int tag;
@@ -40,7 +42,7 @@ public abstract class Data extends ValueNode {
         b.append('"');
         Node d = this;
         while (d.getTag() != 0) {
-            char c = (char) d.getField(0).intValue();
+            char c = (char) d.getField(0).intValue().intValue();
             if (c == '\\' || c == '"') {
                 b.append('\\');
             }
@@ -57,13 +59,22 @@ public abstract class Data extends ValueNode {
         }
         if (getTag() == 1 && getNumFields() == 2) {
             Node v = getField(0);
-            if (!(v instanceof Int && v.intValue() >= 32 && v.intValue() <= 126)) {
+            if (!isPrintableChar(v)) {
                 return false;
             }
             Node t = getField(1);
             return (t instanceof Data) && ((Data) t).isProperList();
         }
         return false;
+    }
+
+    private static boolean isPrintableChar(Node v) {
+        if (!(v instanceof Int)) {
+            return false;
+        }
+        BigInteger m = v.intValue();
+        int n = m.intValue();
+        return (n >= 32 && n <= 126 && m.bitLength() < 8);
     }
 
     private String toListString(int depth) {

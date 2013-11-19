@@ -13,7 +13,7 @@ public class PrimStdPort extends Function {
         // Argument intentionally not evaluated
         Node a = c.getArg(1);
         Node result;
-        switch (a.intValue()) {
+        switch (a.intValue().intValue()) {
         case 0:
             result = new InputPort(new InputStreamReader(System.in));
             break;

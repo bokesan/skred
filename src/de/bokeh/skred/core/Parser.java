@@ -2,6 +2,7 @@ package de.bokeh.skred.core;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -335,7 +336,7 @@ aexp        --> var con literal
             skip();
             return e;
         case LIT_INT:
-            e = Int.valueOf(Integer.parseInt(currTok.text));
+            e = Int.valueOf(new BigInteger(currTok.text));
             skip();
             return e;
         case LIT_STRING:

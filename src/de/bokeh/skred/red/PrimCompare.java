@@ -14,12 +14,11 @@ public class PrimCompare extends Function {
         c.eval();
         Node a2 = c.getTos();
         Node a1 = c.get1();
-        int n1 = a1.intValue();
-        int n2 = a2.intValue();
+        int r = a1.intValue().compareTo(a2.intValue());
         Node result;
-        if (n1 < n2) {
+        if (r < 0) {
             result = Data.valueOf(0);
-        } else if (n1 == n2) {
+        } else if (r == 0) {
             result = Data.valueOf(1);
         } else {
             result = Data.valueOf(2);

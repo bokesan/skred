@@ -1,5 +1,7 @@
 package de.bokeh.skred.red;
 
+import java.math.BigInteger;
+
 /**
  * Int sub
  */
@@ -17,9 +19,7 @@ class PrimSubInt extends Function {
         c.eval();
         Node a2 = c.getTos();
         Node a1 = c.get1();
-        int n1 = a1.intValue();
-        int n2 = a2.intValue();
-        int r = n1 - n2;
+        BigInteger r = a1.intValue().subtract(a2.intValue());
         Node result = Int.valueOf(r);
         c.pop2();
         c.getTos().overwriteInd(result);

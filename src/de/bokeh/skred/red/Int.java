@@ -1,9 +1,11 @@
 package de.bokeh.skred.red;
 
+import java.math.BigInteger;
+
 
 public final class Int extends ValueNode {
 
-    private final int value;
+    private final BigInteger value;
     
     private static final Int[] V = new Int[130];
     static {
@@ -12,7 +14,11 @@ public final class Int extends ValueNode {
     }
 
     private Int(int n) {
-	value = n;
+	value = BigInteger.valueOf(n);
+    }
+    
+    private Int(BigInteger n) {
+        value = n;
     }
     
     public static Int valueOf(int n) {
@@ -20,13 +26,21 @@ public final class Int extends ValueNode {
             return V[n+2];
         return new Int(n);
     }
+    
+    public static Int valueOf(BigInteger val) {
+        int n = val.intValue();
+        if (n >= -2 && n <= 127 && val.bitLength() < 8) {
+            return V[n+2];
+        }
+        return new Int(val);
+    }
 
-    public int intValue() {
+    public BigInteger intValue() {
 	return value;
     }
 
     public String toString(boolean parens, int d) {
-	return Integer.toString(value);
+        return value.toString();
     }
 
 }
