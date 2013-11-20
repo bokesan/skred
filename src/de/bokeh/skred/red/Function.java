@@ -78,12 +78,10 @@ abstract public class Function extends Node {
             I = new CombI_Eval();
             K = new CombK_Eval();
             K1 = new CombK1_Eval();
-            register(new CombIf_Eval());
         } else {
             I = new CombI();
             K = new CombK();
             K1 = new CombK1();
-            register(new CombIf());
         }
         
         register(S);
@@ -229,16 +227,8 @@ abstract public class Function extends Node {
         return f1;
     }
 
-    public static Function primCase(int[] arities) {
-        return primCase(arities, false);
-    }
-
-    public static Function primCaseWithDefault(int[] arities) {
-        return primCase(arities, true);
-    }
-
-    private static Function primCase(int[] arities, boolean def) {
-        return cache(new PrimCase(arities, def));
+    public static Function primCase(int[] arities, boolean def) {
+        return cache(PrimCase.of(arities, def));
     }
     
     public static Function primUnpack(int arity) {

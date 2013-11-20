@@ -16,7 +16,7 @@ public class Data2 extends Data {
         switch (i) {
         case 0: return f0;
         case 1: return f1;
-        default: throw new FieldIndexOutOfBoundsException(i, 2);
+        default: throw new FieldIndexOutOfBoundsException(i, this);
         }
     }
 

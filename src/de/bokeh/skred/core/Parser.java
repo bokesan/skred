@@ -394,11 +394,7 @@ aexp        --> var con literal
         Node c = expression();
         accept(Kind.RESERVEDID, "else");
         Node a = expression();
-        
-        // if p then c else a ==> case p of { <0> -> a; <1> -> c }
-        // return appFactory.mkApp(Function.primCase(new int[]{0,0}), a, c, p);
-        
-        return appFactory.mkApp(Function.valueOf("if"), c, a, p);
+        return appFactory.mkApp(Function.primCase(new int[]{0,0}, true), a, c, p);
     }
 
     private Node caseExpression() throws IOException {
@@ -424,12 +420,17 @@ aexp        --> var con literal
         }
         skip();
         
-        Alt def = alts.remove(-1);
         int[] arities = new int[alts.size()];
         List<Node> altExprs = new ArrayList<>();
         int i = 0;
+        boolean hasDefault = false;
         for (Alt a : alts.values()) {
-            if (a.tag != i) {
+            if (a.tag == Integer.MAX_VALUE) {
+                if (hasDefault) {
+                    syntaxError("duplicate default case");
+                }
+                hasDefault = true;
+            } else if (a.tag != i) {
                 syntaxError("missing tag in case: " + i);
             }
             rTrim(a.xs, "_");
@@ -438,17 +439,7 @@ aexp        --> var con literal
             i++;
         }
 
-        Function c;
-        if (def == null) {
-            c = Function.primCase(arities);
-        } else {
-            c = Function.primCaseWithDefault(arities);
-            if (def.xs.get(0).equals("_")) {
-                altExprs.add(appFactory.mkApp(Function.valueOf("K"), def.e));
-            } else {
-                altExprs.add(ba.abs(def.xs, def.e));
-            }
-        }
+        Function c = Function.primCase(arities, hasDefault);
         altExprs.add(e);
         return appFactory.mkApp(c, altExprs);
     }
@@ -477,9 +468,6 @@ aexp        --> var con literal
     }
     
     
-    
-    
-    
     private static class Alt {
         int tag;
         final List<String> xs = new ArrayList<>();
@@ -491,7 +479,7 @@ aexp        --> var con literal
         if (currTok.kind == Kind.QVARID || (currTok.kind == Kind.RESERVEDID && "_".equals(currTok.text))) {
             a.xs.add(currTok.text);
             skip();
-            a.tag = -1;
+            a.tag = Integer.MAX_VALUE;
         } else {
             accept(Kind.QVARSYM, "<");
             String n = currTok.text;

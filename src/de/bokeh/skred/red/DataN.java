@@ -13,7 +13,7 @@ public class DataN extends Data {
     @Override
     public Node getField(int i) {
         if (i < 0 || i >= fields.length)
-            throw new FieldIndexOutOfBoundsException(i, fields.length);
+            throw new FieldIndexOutOfBoundsException(i, this);
         return fields[i];
     }
 
