@@ -285,7 +285,7 @@ public class Lexer {
         "foreign", "if", "import", "in", "infix", "infixl",
         "infixr", "instance", "let", "module", "newtype", "of",
         "then", "type", "where", "_",
-        "Pack", "letrec"
+        "Pack", "Get", "letrec"
     };
     
     private static boolean isReservedOp(String op) {

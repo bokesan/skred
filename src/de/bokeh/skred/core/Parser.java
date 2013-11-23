@@ -235,6 +235,7 @@ aexp        --> var con literal
             case "letrec":
                 return letrec();
             case "Pack":
+            case "Get":
                 return application();
             default:
                 break;
@@ -325,6 +326,9 @@ aexp        --> var con literal
             if (currTok.text.equals("Pack")) {
                 return constructor();
             }
+            if (currTok.text.equals("Get")) {
+                return getter();
+            }
             break;
         case QVARID:
         case QCONID:
@@ -385,6 +389,15 @@ aexp        --> var con literal
         accept(Kind.LIT_INT);
         accept(Kind.RBRACE);
         return Function.primPack(Integer.parseInt(t), Integer.parseInt(a));
+    }
+
+    private Node getter() throws IOException {
+        skip();
+        accept(Kind.LBRACE);
+        String index = currTok.text;
+        accept(Kind.LIT_INT);
+        accept(Kind.RBRACE);
+        return Function.primGet(Integer.parseInt(index));
     }
 
     private Node conditional() throws IOException {

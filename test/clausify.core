@@ -1,0 +1,323 @@
+--
+-- clausify.f
+--
+
+-- type Clause = (String, String)
+
+string_eq s1 s2 =
+  case s1 of {
+    <0> -> null s2;
+    <1> h1 t1 -> case s2 of {
+                   <0> -> False;
+                   <1> h2 t2 -> and (h1 == h2) (string_eq t1 t2)
+                 }
+  };
+
+clause_eq  c1 c2 = and (string_eq (fst c1) (fst c2))
+                       (string_eq (snd c1) (snd c2));
+
+
+-- Formula type
+Sym = Pack{0,1};
+Not = Pack{1,1};
+Dis = Pack{2,2};
+Con = Pack{3,2};
+Imp = Pack{4,2};
+Eqv = Pack{5,2};
+
+Sym_p x = 0 == tag x;
+Not_p x = 1 == tag x;
+Dis_p x = 2 == tag x;
+Con_p x = 3 == tag x;
+Imp_p x = 4 == tag x;
+Eqv_p x = 5 == tag x;
+
+
+-- StackFrame type
+Ast = Pack{0,1};
+Lex = Pack{1,1};
+
+Ast_p x = 0 == tag x;
+Lex_p x = 1 == tag x;
+
+
+-- 2-Tuples
+T2 = Pack{0,2};
+fst = Get{0};
+snd = Get{1};
+
+-- Formula
+Sym0 = Get{0};
+Not0 = Get{0};
+Dis1 = Get{0};		Dis2 = Get{1};
+Con1 = Dis1;			Con2 = Dis2;
+Imp1 = Dis1;			Imp2 = Dis2;
+Eqv1 = Dis1;			Eqv2 = Dis2;
+Ast0 = Get{0};
+Lex0 = Get{0};
+
+
+--Formula to string
+--f2s :: Formula -> String
+f2s f = case f of {
+          <0> x -> "Sym(" ++ x : ")";
+          <1> p -> "Not(" ++ f2s p ++ ")";
+          <2> p q -> "Dis(" ++ f2s p ++ ", " ++ f2s q ++ ")";
+          <3> p q -> "Con(" ++ f2s p ++ ", " ++ f2s q ++ ")";
+          <4> p q -> "Imp(" ++ f2s p ++ ", " ++ f2s q ++ ")";
+          <5> p q -> "Eqv(" ++ f2s p ++ ", " ++ f2s q ++ ")"
+        };
+
+
+-- separate positive and negative literals, eliminating duplicates
+-- clause :: Formula -> Clause
+   -- clause1 :: Formula -> Clause -> Clause
+   clause1 p x =
+      if Dis_p p then      clause1 (Dis1 p) (clause1 (Dis2 p) x)
+      else if Sym_p p then T2 (insert (Sym0 p) (fst x)) (snd x)
+      else if Not_p p && Sym_p (Not0 p) then
+	 T2 (fst x) (insert (Sym0 (Not0 p)) (snd x))
+      else error 0;
+clause p = clause1 p (T2 "" "");
+
+
+-- shift disjunction within conjunction
+-- disin :: Formula -> Formula
+disin1 p q = case p of {
+               <0> -> disin2 p q;
+               <1> -> disin2 p q;
+               <2> -> disin2 p q;
+               <3> r s -> Con (disin1 r q) (disin1 s q);
+               _   -> disin2 p q
+             };
+
+disin2 p q = case q of {
+               <0> -> Dis p q;
+               <1> -> Dis p q;
+               <2> -> Dis p q;
+               <3> r s -> Con (disin1 p r) (disin1 p s);
+               _ -> Dis p q
+             };
+
+disin x =
+   case x of {
+     <0> _ -> x;
+     <1> _ -> x;
+     <2> p q -> disin1 (disin p) (disin q);
+     <3> p q -> Con (disin p) (disin q);
+     _ -> x
+   };
+
+
+-- showClause :: Clause -> String
+showClause x =
+   interleave (fst x) spaces ++ "<=" ++ interleave spaces (snd x);
+
+
+-- eliminate connectives other than not, disjunction and conjunction
+-- elim :: Formula -> Formula
+elim x =
+  case x of {
+    <0> _ -> x; -- Sym
+    <1> p -> Not (elim p); -- Not
+    <2> p q -> Dis (elim p) (elim q); -- Dis
+    <3> p q -> Con (elim p) (elim q); -- Con
+    <4> p q -> Dis (Not (elim p)) (elim q); -- Imp
+    <5> p q -> Con (elim (Imp p q)) (elim (Imp q p)) -- Eqv
+  };
+
+
+-- insert char into set represented as ordered list
+-- insert :: (Int|Char) -> String -> String
+insert x l = case l of {
+               <0> -> [x];
+               <1> y ys ->
+                  case compare x y of {
+                    <0> -> x : l;
+                    <1> -> l;
+                    <2> -> y : insert x ys
+                  }
+             };
+
+
+-- interleave [a] -> [a] -> [a]
+interleave x y = case x of {
+                   <0> -> [];
+                   <1> h t -> h : interleave y t
+                 };
+
+
+-- shift negation to innermost positions
+-- negin :: Formula -> Formula
+negin x =
+  case x of {
+    <0> -> x;
+    <1> p ->
+        case p of {
+          <0> -> x;
+          <1> q -> negin q;
+          <2> q r -> Con (negin (Not q)) (negin (Not r));
+          <3> q r -> Dis (negin (Not q)) (negin (Not r));
+          _ -> x
+        };
+    <2> p q -> Dis (negin p) (negin q);
+    <3> p q -> Con (negin p) (negin q);
+    _ -> x
+  };
+
+
+-- opri :: char -> int
+opri c = if c == '(' then 0
+	 else if c == '=' then 1
+	 else if c == '>' then 2
+	 else if c == '|' then 3
+	 else if c == '&' then 4
+	 else if c == '~' then 5
+         else error 0;
+
+
+-- parse :: String -> Formula
+parse t = let { x = parse1 t [] } in Ast0 (head x);
+
+--parse1 :: String -> [StackFrame] -> ParseTree
+parse1 x s =
+  if null x then
+    redstar s
+  else
+   let { c = head x;
+       t = tail x }
+   in
+      if c == ' ' then parse1 t s
+      else if c == '(' then parse1 t (Lex '(' : s)
+      else if c == ')' then let { z = redstar s } in
+      		      parse1 t (head z : tail (tail z))
+      else if isLower c then parse1 t (Ast (Sym c) : s)
+      else if spri s > opri c then parse1 x (red s)
+      else parse1 t (Lex c : s);
+
+
+red x =
+   let { p = Ast0 (head x);
+       c = Lex0 (head (tail x));
+       ss= tail (tail x)
+   } in
+   if c == '~' then Ast (Not p) : ss
+   else
+      let { q = Ast0 (head ss); s = tail ss } in
+      if c == '=' then Ast (Eqv q p) : s
+      else if c == '>' then Ast (Imp q p) : s
+      else if c == '|' then Ast (Dis q p) : s
+      else if c == '&' then Ast (Con q p) : s
+      else error 0;
+
+
+redstar = while (\x -> not (spri x == 0)) red;
+while p f x = if p x then while p f (f x) else x;
+
+
+--spaces :: String
+spaces = repeat ' ';
+
+
+--split :: Formula -> [Formula]
+split1 x a =
+   if Con_p x then split1 (Con1 x) (split1 (Con2 x) a)
+             else x:a;
+split p = split1 p [];
+
+
+--spri :: [StackFrame] -> int
+spri x =
+   if not (null x) && not (null (tail x)) &&
+          Ast_p (head x) && Lex_p (head (tail x))
+            then opri (Lex0 (head (tail x)))
+        else 0;
+
+
+--tautclause :: (String ; String) -> bool
+tautclause x = not (null (intersect (fst x) (snd x)));
+
+
+-- unicl :: [Formula] -> [Clause]
+unicl fs = filterSet (\cl -> not (tautclause cl)) (map clause fs);
+
+-- filterSet :: (Clause -> bool) -> [Clause] -> [Clause]
+filterSet =
+   letrec {
+   fs s p cs =
+      case cs of {
+        <0> -> [];
+        <1> x xs ->
+	    if not (any (clause_eq x) s) && p x then
+		x : fs (x:s) p xs
+	    else
+		fs s p xs
+      }
+   } in fs [];
+
+
+--repeat :: a -> [a]
+repeat x = letrec { xs = x:xs } in xs;
+
+
+--intersect :: String -> String -> String
+--intersect s1 s2 =
+--   select
+--      null s1: [],
+--      any (\c -> c == (head s1)) s2:
+--      	   cons (head s1) (intersect (tail s1) s2),
+--      otherwise: intersect (tail s1) s2;
+intersect s1 s2 =
+  case s1 of {
+    <0> -> [];
+    <1> x xs ->
+         case s2 of {
+           <0> -> [];
+           <1> y ys ->
+	       if x < y then intersect xs s2
+	       else if x > y then intersect s1 ys
+	       else x : intersect xs ys
+         }
+  };
+
+
+--clauses :: string -> string
+clauses s = unlines
+	    (map showClause
+	    (unicl
+	    (split
+	    (disin
+	    (negin
+	    (elim (parse s)))))));
+
+--clausify :: string -> string
+clausify = readLn "prop> " clAct;
+           
+
+clAct s = if null s then writeLn "\nBye!" end
+	  else write (clauses s) clausify;
+
+main = interact clausify;
+
+-- unlines   :: [String] -> String
+unlines ss = concat (map (\ln -> ln ++ "\n") ss);
+
+
+
+-- =====================================================================
+-- support functions for interactive programs;
+
+write   msg prog is = msg ++ prog is;
+writeLn msg prog is = msg ++ '\n' : prog is;
+end is = "";
+
+readLn msg prog is =
+   let { x = splitat '\n' is } in
+   msg ++ prog (fst x) (snd x);
+
+--splitat :: Char -> String -> (String ; String)
+splitat c l =
+   if null l then T2 "" ""
+   else if c == (head l) then T2 "" (tail l)
+   else let { x = splitat c (tail l) } in
+        T2 (head l : fst x) (snd x)

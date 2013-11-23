@@ -103,6 +103,11 @@ public abstract class Data extends ValueNode {
         return false;
     }
 
+    @Override
+    public boolean hasVars() {
+        return false;
+    }
+
     // Factory part ------------------------------------------
 
     public static Data valueOf(int tag) {

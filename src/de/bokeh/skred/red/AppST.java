@@ -15,6 +15,11 @@ public final class AppST extends Node {
 	arg = a;
     }
     
+    public boolean hasVars() {
+        return (arg != null && arg.hasVars())
+                || (fun != null && fun.hasVars());
+    }
+   
     @Override
     public boolean isApp() {
         return state.isApp();

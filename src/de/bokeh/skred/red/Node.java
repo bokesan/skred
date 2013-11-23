@@ -21,6 +21,8 @@ public abstract class Node {
     
     abstract public String toString(boolean parens, int maxDepth);
     
+    abstract public boolean hasVars();
+    
     @Override
     public String toString() {
         return toString(false, 12);

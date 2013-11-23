@@ -59,8 +59,13 @@ abstract public class Function extends Node {
         return getName();
     }
     
-    // Factory
+    @Override
+    public boolean hasVars() {
+        return false;
+    }
     
+    // Factory
+
     private static final Map<String, Function> functionsByName = new HashMap<String, Function>();
     
     protected static final Function ERROR = new PrimError();
@@ -115,6 +120,7 @@ abstract public class Function extends Node {
         register(new PrimEq());
         register(new PrimNeq());
         register(new PrimZero());
+        register(new PrimTag());
         
         register(ERROR);
         register(new PrimRead());

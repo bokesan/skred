@@ -13,6 +13,11 @@ public final class AppCond extends Node {
 	fun = f;
 	arg = a;
     }
+    
+    public boolean hasVars() {
+        return (arg != null && arg.hasVars())
+                || (fun != null && fun.hasVars());
+    }
 
     public boolean isApp() {
         return arg != null && fun != null;

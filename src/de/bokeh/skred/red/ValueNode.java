@@ -34,4 +34,9 @@ public abstract class ValueNode extends Node {
         throw new RedException("tried to overwrite value");
     }
 
+    @Override
+    public boolean hasVars() {
+        return false;
+    }
+
 }

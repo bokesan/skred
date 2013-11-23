@@ -16,5 +16,10 @@ public class Symbol extends ValueNode {
     public String toString(boolean parens, int d) {
         return sym;
     }
-    
+
+    @Override
+    public boolean hasVars() {
+        return true;
+    }
+
 }

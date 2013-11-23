@@ -6,7 +6,7 @@ public class PrimGet extends Function {
     private final int index;
     
     public PrimGet(int index) {
-        super("get{" + index + "}", 1);
+        super("Get{" + index + "}", 1);
         this.index = index;
     }
     

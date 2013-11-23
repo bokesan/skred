@@ -82,4 +82,9 @@ public class AppIndI extends Node {
         return "#HOLE";
     }
 
+    @Override
+    public boolean hasVars() {
+        return arg.hasVars() || (fun != null && fun.hasVars());
+    }
+
 }
