@@ -26,11 +26,11 @@ abstract public class Function extends Node {
     public Node unwind(RedContext c) {
         unwindCount++;
         //System.err.println("unwinding: " + this + ", arity " + this.numArgs + ", " + c.spine.numArgs() + " args on spine");
-        if (c.numArgs() < this.numArgs) {
-            argCheckCount++;
-            return c.argCheckFailed();
+        if (c.numArgs() >= this.numArgs) {
+            return exec(c);
         }
-        return exec(c);
+        argCheckCount++;
+        return c.argCheckFailed();
     }
     
     @Override

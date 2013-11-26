@@ -1,12 +1,6 @@
 package de.bokeh.skred.red;
 
-public class Data0 extends Data {
-
-    private final int tag;
-    
-    Data0(int tag) {
-        this.tag = tag;
-    }
+public class Data0_0 extends Data {
 
     @Override
     public int getNumFields() {
@@ -20,7 +14,7 @@ public class Data0 extends Data {
 
     @Override
     public int getTag() {
-        return tag;
+        return 0;
     }
 
 }

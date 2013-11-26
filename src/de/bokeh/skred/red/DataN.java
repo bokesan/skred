@@ -2,10 +2,11 @@ package de.bokeh.skred.red;
 
 public class DataN extends Data {
 
+    private final int tag;
     private final Node[] fields;
     
     public DataN(int tag, Node... fields) {
-        super(tag);
+        this.tag = tag;
         this.fields = new Node[fields.length];
         System.arraycopy(fields, 0, this.fields, 0, fields.length);
     }
@@ -20,6 +21,11 @@ public class DataN extends Data {
     @Override
     public int getNumFields() {
         return fields.length;
+    }
+
+    @Override
+    public int getTag() {
+        return tag;
     }
 
 }

@@ -1,13 +1,11 @@
 package de.bokeh.skred.red;
 
-public class Data2 extends Data {
+public class Data1_2 extends Data {
 
-    private final int tag;
     private final Node f0;
     private final Node f1;
     
-    public Data2(int tag, Node f0, Node f1) {
-        this.tag = tag;
+    public Data1_2(Node f0, Node f1) {
         this.f0 = f0;
         this.f1 = f1;
     }
@@ -28,7 +26,7 @@ public class Data2 extends Data {
 
     @Override
     public int getTag() {
-        return tag;
+        return 1;
     }
 
 }

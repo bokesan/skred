@@ -3,17 +3,8 @@ package de.bokeh.skred.red;
 import java.math.BigInteger;
 
 public abstract class Data extends ValueNode {
-
-    private final int tag;
     
-    public Data(int tag) {
-        assert tag >= 0;
-        this.tag = tag;
-    }
-    
-    public int getTag() {
-        return tag;
-    }
+    abstract public int getTag();
     
     @Override
     public String toString(boolean parens, int maxDepth) {
@@ -24,7 +15,7 @@ public abstract class Data extends ValueNode {
             return toListString(maxDepth - 1);
         }
         StringBuilder b = new StringBuilder("#");
-        b.append(tag);
+        b.append(getTag());
         b.append('{');
         String sep = "";
         int n = getNumFields();
@@ -126,14 +117,20 @@ public abstract class Data extends ValueNode {
     }
     
     public static Data valueOf(int tag, Node f0, Node f1) {
+        if (tag == 1)
+            return new Data1_2(f0, f1);
         return new Data2(tag, f0, f1);
     }
     
     public static Data valueOf(int tag, Node[] fields) {
-        return new DataN(tag, fields);
+        switch (fields.length) {
+        case 0: return valueOf(tag);
+        case 2: return valueOf(tag, fields[0], fields[1]);
+        default: return new DataN(tag, fields);
+        }
     }
     
-    private static final Data Enum0 = new Data0(0);
+    private static final Data Enum0 = new Data0_0();
     private static final Data Enum1 = new Data0(1);
     private static final Data Enum2 = new Data0(2);
     private static final Data Enum3 = new Data0(3);
