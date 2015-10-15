@@ -1,12 +1,12 @@
 # SKRED
 
-A SK combinator graph reduction engine implemented in Java.
+An SK combinator graph reduction engine implemented in Java.
 
 Features:
 
 * A simple core language.
-* Build-in functions for arithmetic and structured data.
-* Can be used standalone or as target for a more sophisticated compiler.
+* Built-in functions for arithmetic and structured data.
+* Can be used standalone or as the target language for a more sophisticated compiler.
 * Reasonable performance (for SK combinator reduction, that is).
 
 ## Documentation
