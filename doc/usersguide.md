@@ -105,9 +105,9 @@ is invalid and won't compile:
                        _ -> 0;
                      }
 
-Case expression compile to **Case** primitives. Case primitives are parametrized
-by the arities of the alternatives. There are three variants: without default
-case, with default case using the expression value, and with default case
+Case expressions compile to **Case** primitives. Case primitives are parametrized
+by the arities of the alternatives. There are three variants: without a default
+case, with a default case using the expression value, and with a default case
 ignoring the expression value.
 
 As an example, the length function defined above would compile to:
