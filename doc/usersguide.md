@@ -15,7 +15,7 @@ using combinator graph reduction.
 Option | Description
 ------ | -----------
 --evalprojections --noevalprojections | evaluate result of projection functions?
---app=Cond&#124;IndI&#124;ST  |  choose implementation of overwriting.
+--app=Cond\|IndI\|ST  |  choose implementation of overwriting.
 --stats=_file_ | report evaluation statistics in _file_.
 --noopt        | don't do optimizations like `C add ==> add`.
 --useB1        | use B' instead of B* combinator
@@ -66,16 +66,16 @@ A *program* is a list of definitions separated by semicolons.
 Some infix operators are provided as syntactic sugar for built-in functions.
 In descending order of precedence:
 
-Operator | Function | Associativity
--------- | -------- | -------------
-.        | B        | right
-* / %    | mul quot rem | left
-+ -      | add sub  | left
-: ++     | Pack{1,2} append | right
-= /= < <= > >= | eq ne lt le gt ge | non
-&&       | and      | right
-&#124;&#124; | or       | right
-$        | function application | right
+| Operator | Function                | Associativity
+| -------- | ----------------------- | -------------
+| .        | B                       | right
+| * / %    | mul quot rem            | left
+| + -      | add sub                 | left
+| : ++     | Pack{1,2} append        | right
+| = /= < <= > >= | eq ne lt le gt ge | non
+| &&       | and                     | right
+| \|\|     | or                      | right
+| $        | function application    | right
 
 
 ### Case Expressions
@@ -177,14 +177,14 @@ Rquot    | flip quot
 Rrem     | flip rem
 succ     | succ n -> n + 1
 pred     | pred n -> n - 1
-compare  | compare m n &#124; m < n -> Data{0} &#124; m = n -> Data{1} &#124; m > n -> Data{2}
-eq       | eq m n &#124; m = n -> Data{1} &#124; m ≠ n -> Data{0}
-ne       | ne m n &#124; m ≠ n -> Data{1} &#124; m = n -> Data{0}
-lt       | lt m n &#124; m < n -> Data{1} &#124; m ≥ n -> Data{0}
-le       | le m n &#124; m ≤ n -> Data{1} &#124; m > n -> Data{0}
-gt       | gt m n &#124; m > n -> Data{1} &#124; m ≤ n -> Data{0}
-ge       | ge m n &#124; m ≥ n -> Data{1} &#124; m < n -> Data{0}
-zero     | zero n &#124; n = 0 -> Data{1} &#124; m ≠ 0 -> Data{0}
+compare  | compare m n \| m < n -> Data{0} \| m = n -> Data{1} \| m > n -> Data{2}
+eq       | eq m n \| m = n -> Data{1} \| m ≠ n -> Data{0}
+ne       | ne m n \| m ≠ n -> Data{1} \| m = n -> Data{0}
+lt       | lt m n \| m < n -> Data{1} \| m ≥ n -> Data{0}
+le       | le m n \| m ≤ n -> Data{1} \| m > n -> Data{0}
+gt       | gt m n \| m > n -> Data{1} \| m ≤ n -> Data{0}
+ge       | ge m n \| m ≥ n -> Data{1} \| m < n -> Data{0}
+zero     | zero n \| n = 0 -> Data{1} \| m ≠ 0 -> Data{0}
 
 ### IO and System
 
@@ -192,8 +192,8 @@ Function | Reduction rule | Remark
 -------- | -------------- | ------
 error    | *terminate program*
 primStdPort | TODO
-hPutChar | hPutChar h c w -> Data{0,Data{0},w'} &#124; ioError
-hGetChar | hGetChar h w -> Data{0,c,w'} &#124; ioError
+hPutChar | hPutChar h c w -> Data{0,Data{0},w'} \| ioError
+hGetChar | hGetChar h w -> Data{0,c,w'} \| ioError
 _READ    | TODO
 cmdLine  | -              | List of command line arguments
 
@@ -205,8 +205,8 @@ Pack{*t*,*n*} | Pack{*t*,*n*} x<sub>0</sub> … x<sub>n-1</sub> -> Data{*t*,x<su
 Case{*a0*,*a1*,...} | See section "Case Expressions"
 Unpack{_n_} | Unpack{_n_} f Data{_t_,x<sub>0</sub>,…} -> f x<sub>0</sub> … x<sub>n-1</sub>
 Get{_n_} | Get{_n_} Data{_t_,x<sub>0</sub>,…} -> x<sub>n</sub> | fst = get{0}; snd = get{1}
-tag      | tag Data{_t_,…} -> t &#124; tag _ -> -1   | tag; -1 for integers
-fields   | fields Data{_t_,x<sub>0</sub>,…,x<sub>n-1</sub>} -> n &#124; arity _ -> -1  | number of fields; -1 for integers
+tag      | tag Data{_t_,…} -> t \| tag _ -> -1   | tag; -1 for integers
+fields   | fields Data{_t_,x<sub>0</sub>,…,x<sub>n-1</sub>} -> n \| arity _ -> -1  | number of fields; -1 for integers
 
 The functions _tag_ and _fields_ can be used for type predicates:
 
