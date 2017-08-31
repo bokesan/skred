@@ -11,10 +11,15 @@ public class BA {
     
     private final AppFactory appFactory;
     private final boolean useBStar;
+    private final Transformer opt1;
 
     public BA(AppFactory appFactory, boolean useBStar) {
         this.appFactory = appFactory;
         this.useBStar = useBStar;
+        MultiTransformer t = new MultiTransformer(appFactory);
+        t.add(new OptConstantFloating(appFactory));
+        t.add(new OptEvalConstructors(appFactory));
+        opt1 = t;
     }
     
     
@@ -31,6 +36,7 @@ public class BA {
             return appFactory.mkApp(Function.valueOf("K"), e); 
         }
         if (e.isApp()) {
+            e = opt1.transform(e);
             return opt(abs(x, e.getFun()), abs(x, e.getArg()));
         } else {
             if (e instanceof Symbol && e.toString().equals(x)) {
