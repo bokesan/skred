@@ -48,8 +48,8 @@
   <target name="compile" depends="init" description="Compile">
     <javac srcdir="src"
            destdir="${classes.dir}"
-	       source="7"
-	       target="7"
+	       source="8"
+	       target="8"
            encoding="utf-8"
 	       debug="${build.debug}">
       <classpath refid="compile.classpath" />

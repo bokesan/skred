@@ -47,9 +47,7 @@ public class Parser extends AbstractSkReader {
         if (currTok.kind != Kind.EOF) {
             syntaxError("EOF expected, but got " + currTok);
         }
-        for (Map.Entry<String, Node> e : ds.entrySet()) {
-            addDefn(e.getKey(), e.getValue());
-        }
+        ds.forEach(super::addDefn);
     }
 
     private Map<String, Node> defns() throws IOException {
@@ -257,10 +255,7 @@ aexp        --> var con literal
         Node body = expression();
         List<String> xs = new ArrayList<>();
         List<Node> es = new ArrayList<>();
-        for (Map.Entry<String, Node> e : ds.entrySet()) {
-            xs.add(e.getKey());
-            es.add(e.getValue());
-        }
+        ds.forEach((k,v) -> { xs.add(k); es.add(v); });
         if (xs.size() == 1) {
             // only 1 binding
             Node f = ba.abs(xs.get(0), body);
@@ -297,10 +292,7 @@ aexp        --> var con literal
         Node body = expression();
         List<String> xs = new ArrayList<>();
         List<Node> es = new ArrayList<>();
-        for (Map.Entry<String, Node> e : ds.entrySet()) {
-            xs.add(e.getKey());
-            es.add(e.getValue());
-        }
+        ds.forEach((k,v) -> { xs.add(k); es.add(v); });
         body = ba.abs(xs, body);
         for (Node e : es) {
             body = appFactory.mkApp(body, e);
