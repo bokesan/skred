@@ -1,0 +1,5 @@
+<FindBugsFilter>
+  <Match>
+    <Bug code="Se,SnVI" />  <!-- Serialisierung ist uns egal -->
+  </Match>
+</FindBugsFilter>
