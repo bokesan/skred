@@ -1,4 +1,4 @@
-# SKRED
+# SKRED [![Build Status](https://travis-ci.org/bokesan/skred.svg?branch=master)](https://travis-ci.org/bokesan/skred)
 
 An SK combinator graph reduction engine implemented in Java.
 
