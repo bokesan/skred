@@ -1,0 +1,66 @@
+apply plugin: 'java'
+
+sourceCompatibility = 1.8
+version = '0.1.0'
+jar {
+    manifest {
+        attributes 'Implementation-Title': 'skred',
+                   'Implementation-Vendor': 'Christoph Breitkopf',
+                   'Implementation-Version': version,
+                   'Built-By': System.getProperty('user.name'),
+                   'Built-JDK': System.getProperty('java.version'),
+                   'Main-Class': 'de.bokeh.skred.SkRed'
+    }
+    from {
+        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
+
+apply plugin: 'findbugs'
+findbugs {
+    sourceSets = [sourceSets.main]
+    ignoreFailures = true
+    effort = "max"
+    reportLevel = "low"
+    excludeFilter = file("$rootProject.projectDir/fb-exclude.xml")
+}
+
+tasks.withType(FindBugs) {
+    reports {
+        xml.enabled = false
+        html.enabled = true
+    }
+ }
+
+sourceSets {
+    main {
+        java {
+            srcDir 'src'
+        }
+        resources {
+            srcDir 'lib'
+        }
+    }
+    test {
+        java {
+            srcDir 'test/src'
+        }
+        resources {
+            srcDir 'test'
+        }
+    }
+}
+
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.8.0-alpha2'
+    compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '4.1'
+}
