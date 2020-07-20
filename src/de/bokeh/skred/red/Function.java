@@ -168,8 +168,8 @@ abstract public class Function extends Node {
                 return 1;
             if (o1.argCheckCount > o2.argCheckCount)
                 return -1;
-            if (o1.argCheckCount > o2.argCheckCount)
-                return -1;
+            if (o1.argCheckCount < o2.argCheckCount)
+                return 1;
             return o1.name.compareTo(o2.name);
         }
         

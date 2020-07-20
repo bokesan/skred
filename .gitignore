@@ -1,6 +1,7 @@
 /uncontrolled
 /build
 /dist
+.gradle/
 *~
 *.o
 *.hi
