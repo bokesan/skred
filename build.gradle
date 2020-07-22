@@ -16,22 +16,6 @@ jar {
     }
 }
 
-apply plugin: 'findbugs'
-findbugs {
-    sourceSets = [sourceSets.main]
-    ignoreFailures = true
-    effort = "max"
-    reportLevel = "low"
-    excludeFilter = file("$rootProject.projectDir/fb-exclude.xml")
-}
-
-tasks.withType(FindBugs) {
-    reports {
-        xml.enabled = false
-        html.enabled = true
-    }
- }
-
 sourceSets {
     main {
         java {
@@ -57,10 +41,7 @@ repositories {
 }
 
 dependencies {
-    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.8.0-alpha2'
+    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.30'
     compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
 }
 
-task wrapper(type: Wrapper) {
-    gradleVersion = '4.1'
-}

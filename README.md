@@ -15,11 +15,11 @@ See [the documentation](doc/usersguide.md). The [test](test) folder contains som
 
 ## Installing
 
-Run "ant jar" and move dist/skred.jar to a location of your choice.
+Run `./gradlew build` and move `build/libs/skred-*.jar` to a location of your choice.
 
 ## Running core programs
 
-> java -jar skred.jar *your_program*.core
+    java -jar skred.jar *your_program*.core
 
 ## License
 
