@@ -23,7 +23,7 @@ public class OptEvalConstructors extends Transformer {
         PrimPack p = (PrimPack) f;
         if (p.getArity() != arity) return null;
         Node[] fields = new Node[arity];
-        for (int i = arity - 1; i >= 0; i++) {
+        for (int i = arity - 1; i >= 0; i--) {
             if (n.getArg().hasVars())
                 return null;
             fields[i] = n.getArg();
