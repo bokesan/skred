@@ -17,8 +17,8 @@ import de.bokeh.skred.red.Symbol;
 abstract public class AbstractSkReader implements SkReader {
 
     protected final AppFactory appFactory;
-    private final Map<String, Node> defns = new HashMap<String, Node>();
-    private final Set<String> rewritten = new HashSet<String>();
+    private final Map<String, Node> defns = new HashMap<>();
+    private final Set<String> rewritten = new HashSet<>();
 
     public AbstractSkReader(AppFactory appFactory) {
         this.appFactory = appFactory;
@@ -102,7 +102,7 @@ abstract public class AbstractSkReader implements SkReader {
     private Node link(Node e) throws SkFileCorruptException {
         if (e instanceof Symbol) {
             Node d = defns.get(e.toString());
-            while (d != null && (d instanceof Symbol)) {
+            while (d instanceof Symbol) {
                 e = d;
                 d = defns.get(e.toString());
             }
