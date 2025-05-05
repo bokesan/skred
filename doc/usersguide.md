@@ -148,43 +148,43 @@ This interprets data objects with tag 0 as false and all others as true.
 
 Function | Reduction rule | Remark
 -------- | -------------- | ------
-S    | S f g x -> f x (g x)
-K    | K c x -> c                           | Haskell: const
-I    | I x -> x                             | Haskell: id
-B    | B f g x -> f (g x)                   | Haskell: (.)
-C    | C f x y -> f y x                     | Haskell: 
-B'   | B' p q r s -> p q (r s)
-Bs   | Bs p q r s -> p (q (r s))            | Sheevel's B* 
-C'   | C' p q r s -> p (q s) r
-S'   | S' p q r s -> p (q s) (r s)
-J    | J p q r -> p q
-J'   | J' p q r s -> p q r
-W    | W f x -> f x x
-Y    | Y f -> f (Y f)                       | builds cyclic graph
+S    | S f g x ⇒ f x (g x)
+K    | K c x ⇒ c                           | Haskell: const
+I    | I x ⇒ x                             | Haskell: id
+B    | B f g x ⇒ f (g x)                   | Haskell: (.)
+C    | C f x y ⇒ f y x                     | Haskell: 
+B'   | B' p q r s ⇒ p q (r s)
+Bs   | Bs p q r s ⇒ p (q (r s))            | Sheevel's B* 
+C'   | C' p q r s ⇒ p (q s) r
+S'   | S' p q r s ⇒ p (q s) (r s)
+J    | J p q r ⇒ p q
+J'   | J' p q r s ⇒ p q r
+W    | W f x ⇒ f x x
+Y    | Y f ⇒ f (Y f)                       | builds cyclic graph
 
 
 ### Numeric Functions
 
 Function | Reduction rule | Remark
 -------- | -------------- | ------
-add      | add m n -> m + n   | Integer addition
-sub      | sub m n -> m - n   | Integer subtraction
-mul      | mul m n -> m * n   | Integer multiplication
+add      | add m n ⇒ m + n   | Integer addition
+sub      | sub m n ⇒ m - n   | Integer subtraction
+mul      | mul m n ⇒ m * n   | Integer multiplication
 quot     | Integer quotient
 rem      | Integer remainder
-Rsub     | Rsub m n -> n - m  | flip sub
+Rsub     | Rsub m n ⇒ n - m  | flip sub
 Rquot    | flip quot
 Rrem     | flip rem
-succ     | succ n -> n + 1
-pred     | pred n -> n - 1
-compare  | compare m n \| m < n -> Data{0} \| m = n -> Data{1} \| m > n -> Data{2}
-eq       | eq m n \| m = n -> Data{1} \| m ≠ n -> Data{0}
-ne       | ne m n \| m ≠ n -> Data{1} \| m = n -> Data{0}
-lt       | lt m n \| m < n -> Data{1} \| m ≥ n -> Data{0}
-le       | le m n \| m ≤ n -> Data{1} \| m > n -> Data{0}
-gt       | gt m n \| m > n -> Data{1} \| m ≤ n -> Data{0}
-ge       | ge m n \| m ≥ n -> Data{1} \| m < n -> Data{0}
-zero     | zero n \| n = 0 -> Data{1} \| m ≠ 0 -> Data{0}
+succ     | succ n ⇒ n + 1
+pred     | pred n ⇒ n - 1
+compare  | compare m n \| m < n ⇒ Data{0} \| m = n ⇒ Data{1} \| m > n ⇒ Data{2}
+eq       | eq m n \| m = n ⇒ Data{1} \| m ≠ n ⇒ Data{0}
+ne       | ne m n \| m ≠ n ⇒ Data{1} \| m = n ⇒ Data{0}
+lt       | lt m n \| m < n ⇒ Data{1} \| m ≥ n ⇒ Data{0}
+le       | le m n \| m ≤ n ⇒ Data{1} \| m > n ⇒ Data{0}
+gt       | gt m n \| m > n ⇒ Data{1} \| m ≤ n ⇒ Data{0}
+ge       | ge m n \| m ≥ n ⇒ Data{1} \| m < n ⇒ Data{0}
+zero     | zero n \| n = 0 ⇒ Data{1} \| m ≠ 0 ⇒ Data{0}
 
 ### IO and System
 
@@ -192,8 +192,8 @@ Function | Reduction rule | Remark
 -------- | -------------- | ------
 error    | *terminate program*
 primStdPort | TODO
-hPutChar | hPutChar h c w -> Data{0,Data{0},w'} \| ioError
-hGetChar | hGetChar h w -> Data{0,c,w'} \| ioError
+hPutChar | hPutChar h c w ⇒ Data{0,Data{0},w'} \| ioError
+hGetChar | hGetChar h w ⇒ Data{0,c,w'} \| ioError
 _READ    | TODO
 cmdLine  | -              | List of command line arguments
 
@@ -201,12 +201,12 @@ cmdLine  | -              | List of command line arguments
 
 Function | Reduction rule | Remark
 -------- | -------------- | ------
-Pack{*t*,*n*} | Pack{*t*,*n*} x<sub>0</sub> … x<sub>n-1</sub> -> Data{*t*,x<sub>0</sub>,…,x<sub>n-1</sub>} | Constructor
+Pack{*t*,*n*} | Pack{*t*,*n*} x<sub>0</sub> … x<sub>n-1</sub> ⇒ Data{*t*,x<sub>0</sub>,…,x<sub>n-1</sub>} | Constructor
 Case{*a0*,*a1*,...} | See section "Case Expressions"
-Unpack{_n_} | Unpack{_n_} f Data{_t_,x<sub>0</sub>,…} -> f x<sub>0</sub> … x<sub>n-1</sub>
-Get{_n_} | Get{_n_} Data{_t_,x<sub>0</sub>,…} -> x<sub>n</sub> | fst = get{0}; snd = get{1}
-tag      | tag Data{_t_,…} -> t \| tag _ -> -1   | tag; -1 for integers
-fields   | fields Data{_t_,x<sub>0</sub>,…,x<sub>n-1</sub>} -> n \| arity _ -> -1  | number of fields; -1 for integers
+Unpack{_n_} | Unpack{_n_} f Data{_t_,x<sub>0</sub>,…} ⇒ f x<sub>0</sub> … x<sub>n-1</sub>
+Get{_n_} | Get{_n_} Data{_t_,x<sub>0</sub>,…} ⇒ x<sub>n</sub> | fst = get{0}; snd = get{1}
+tag      | tag Data{_t_,…} ⇒ t \| tag _ ⇒ -1   | tag; -1 for integers
+fields   | fields Data{_t_,x<sub>0</sub>,…,x<sub>n-1</sub>} ⇒ n \| arity _ ⇒ -1  | number of fields; -1 for integers
 
 The functions _tag_ and _fields_ can be used for type predicates:
 
